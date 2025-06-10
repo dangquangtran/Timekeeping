@@ -16,7 +16,7 @@ namespace TimeKeeping.Application.ViewModels.AccountViewModel
         public string FullName { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]
-        [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+        [MinLength(5, ErrorMessage = "Password must be at least 5 characters.")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "GroupFuncID is required.")]
