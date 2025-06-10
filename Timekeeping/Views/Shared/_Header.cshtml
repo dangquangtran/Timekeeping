@@ -1,9 +1,9 @@
 ﻿<link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
-<header class="border-bottom">
-    <div class="container-fluid d-flex row" style="background-color:#1d2452">
+<header class="border-bottom mb-3">
+    <div class="container-fluid d-flex row m-0 p-0" style="background-color:#1d2452">
         <div class="col-md-3"></div>
         <nav class="nav col-md-5">
-            <a href="#" class="nav-link custom-tab">TRANG CHỦ</a>
+            <a href="/" class="nav-link custom-tab">TRANG CHỦ</a>
             <a href="#" class="nav-link custom-tab">GIẢI TRÌNH</a>
             <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT
                 <i class="fa-solid fa-caret-down ms-1"></i>
@@ -20,22 +20,24 @@
         </nav>
         <div class="profile d-flex align-items-center col-md-4 justify-content-center">
             <div>
-                <i class="fa-solid fa-circle-user"></i>
-                <a href="/logout" class="text-white text-decoration-none">Đào Anh Dũng</a>
+                
+                <a href="/logout" class="text-white text-decoration-none">
+                    <i class="fa-solid fa-circle-user pe-1"></i>Đào Anh Dũng</a>
             </div>
             <div class="ms-3">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <a href="/logout" class="text-white">Đăng xuất</a>
+                <a href="/logout" class="text-white">
+                    <i class="fa-solid fa-right-from-bracket pe-1"></i>Đăng xuất
+                </a>
             </div>
         </div>
     </div>
-    <div class="row py-2">
+    <div class="row py-2 m-0">
         <div class="logo col-md-3 d-flex justify-content-end">
             <a href="/">
                 <img alt="" src="~/images/logo.png" style="width: 180px; height: 34px; margin-top: 0px;">
             </a>
         </div>
-        <div class="col-md-9 d-flex align-items-center">
+        <div class="col-md-9 d-flex align-items-center px-2">
             <div id="update-dropdown" class="dropdown-content d-none">
                 <a href="#" class="dropdown-link me-3">Vi phạm khác</a>
                 <a href="#" class="dropdown-link me-3">Kỳ báo cáo</a>
@@ -55,7 +57,7 @@
             </div>
             <div id="admin-dropdown" class="dropdown-content d-none">
                 <a href="#" class="dropdown-link me-3">Phân quyền</a>
-                <a href="#" class="dropdown-link me-3">Dữ liệu chấm công</a>
+                <a href="/QuanTri/DulieuChamCong" class="dropdown-link me-3">Dữ liệu chấm công</a>
             </div>
         </div>
     </div>
