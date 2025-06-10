@@ -11,6 +11,7 @@ using TimeKeeping.Infrastructure.Persistence;
 using TimeKeeping.Infrastructure.Repositories;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Infrastructure.ServiceImpls;
+using Microsoft.Extensions.Logging;
 
 namespace TimeKeeping.Infrastructure
 {
@@ -25,7 +26,17 @@ namespace TimeKeeping.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ILyDoViPhamService, LyDoViPhamService>();
             services.AddScoped<IChamCongCheckInOutV1Service, ChamCongCheckInOutV1Service>();
+           // services.AddScoped<IAccountService, AccountService>();
+           
+            var jwtSecretKey = configuration["Jwt:SecretKey"];
 
+            // Đăng ký AccountService và truyền jwtSecretKey vào constructor
+            services.AddScoped<IAccountService>(provider =>
+                new AccountService(
+                    provider.GetRequiredService<IUnitOfWork>(),
+                    provider.GetRequiredService<ILogger<AccountService>>(),
+                    jwtSecretKey
+                ));
             return services;
         }
     }

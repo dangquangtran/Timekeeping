@@ -24,6 +24,7 @@ namespace TimeKeeping.Application.Interfaces
         IGenericRepository<tb_trangthaiky> TrangThaiKyRepo { get; }
         IGenericRepository<tb_viphamchamcongvantay> ViPhamChamCongVanTayRepo { get; }
         IGenericRepository<tb_vpcc_temp> VPCCTempRepo { get; }
+        IGenericRepository<tb_Account> AccountRepo { get; }
 
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();

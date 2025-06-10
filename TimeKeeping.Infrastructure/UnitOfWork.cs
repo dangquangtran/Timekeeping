@@ -66,6 +66,9 @@ namespace TimeKeeping.Infrastructure
         private IGenericRepository<tb_vpcc_temp> _vpccTempRepo;
         public IGenericRepository<tb_vpcc_temp> VPCCTempRepo => _vpccTempRepo ??= new GenericRepository<tb_vpcc_temp>(_context);
 
+        private IGenericRepository<tb_Account> accountRepo;
+        public IGenericRepository<tb_Account> AccountRepo => accountRepo ??= new GenericRepository<tb_Account>(_context);
+
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
         public async Task BeginTransactionAsync()
