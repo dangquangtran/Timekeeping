@@ -9,8 +9,10 @@ namespace TimeKeeping.Domain.Entities
     public partial class tb_Account
     {
         public int ID { get; set; }
-        public string MaNhanVien { get; set; }
+        public string? MaNhanVien { get; set; }
         public string FullName { get; set; }
+        public string ChucVu { get; set; }
+        public string MaDv { get; set; }
         public string UserName { get; set; } = null!;
         public string HashPassword { get; set; } = null!;
         public bool IsActive { get; set; }

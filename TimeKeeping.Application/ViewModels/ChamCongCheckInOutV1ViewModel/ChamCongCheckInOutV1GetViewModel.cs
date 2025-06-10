@@ -8,19 +8,21 @@ namespace TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel
 {
     public class ChamCongCheckInOutV1GetViewModel
     {
-        public string? ID { get; set; }
+        public string? MaChamCong { get; set; }
 
-        public string? MaNhanVien { get; set; }
+        public string? HoTen { get; set; }
+        public string? ChucDanh { get; set; }
+        public string? DonVi { get; set; }
 
-        public DateTime? NgayCham { get; set; }
+        public string? NgayCham { get; set; }
 
-        public DateTime? GioCham { get; set; }
+        public string? GioCham { get; set; }
 
-        public int? KieuCham { get; set; }
+        //public int? KieuCham { get; set; }
 
-        public int? NguonCham { get; set; }
+        //public int? NguonCham { get; set; }
 
-        public int? MaSoMay { get; set; }
+        //public int? MaSoMay { get; set; }
 
         public string? TenMay { get; set; }
     }

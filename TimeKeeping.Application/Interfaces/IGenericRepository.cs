@@ -12,6 +12,7 @@ namespace TimeKeeping.Application.Interfaces
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(object id);
         Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate);
         Task<(IEnumerable<T> Data, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize);
         Task AddAsync(T entity);
         void Update(T entity);

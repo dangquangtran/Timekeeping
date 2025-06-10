@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TimeKeeping.Application.Interfaces;
+using TimeKeeping.Domain.Entities;
 using TimeKeeping.Infrastructure.Persistence;
 
 namespace TimeKeeping.Infrastructure.Repositories
@@ -44,6 +45,11 @@ namespace TimeKeeping.Infrastructure.Repositories
         {
             return await _dbSet.FirstOrDefaultAsync(predicate);
         }
+        public async Task<IEnumerable<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
     }
 
 
