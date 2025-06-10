@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TimeKeeping.Application.ViewModels.LyDoViPhamViewModel.LyDoViPhamGetViewModel>
+﻿@model IEnumerable<TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel.ChamCongCheckInOutV1GetViewModel>
 
 @{
     ViewData["Title"] = "Giải trình chấm công và báo cáo";
@@ -6,16 +6,19 @@
 }
 
 <div class="container">
-    <p class="border-bottom mb-5">Trang chủ</p>
+    <p class="border-bottom mb-5">Quản trị/Dữ liệu chấm công</p>
     <h5 class="text-center" style="color: #ef4e24"><strong>THÔNG TIN CHUNG</strong></h5>
     <table class="table table-bordered" style="border-color:#00bfff">
         <thead class="text-center" style="background-color: lightgray">
             <tr>
                 <th>STT</th>
-                <th>Lý do vi phạm chấm công</th>
-                <th>Kèm file</th>
-                <th>Ghi nhận</th>
-                <th>Ghi chú</th>
+                <th>Mã chấm công</th>
+                <th>Họ tên</th>
+                <th>Chức danh</th>
+                <th>Đơn vị</th>
+                <th>Ngày chấm</th>
+                <th>Giờ chấm</th>
+                <th>Tên máy</th>
             </tr>
         </thead>
         <tbody>
@@ -25,10 +28,13 @@
                 {
                     <tr>
                         <td>@stt</td>
-                        <td>@item.tenlydo</td>
-                        <td>@(item.kemfile == 1 ? "Có" : "Không")</td>
-                        <td>@(item.ghinhan == 1 ? "Vi phạm" : "Không vi phạm")</td>
-                        <td>@item.ghichu</td>
+                        <td>@item.MaNhanVien</td>
+                        <td>@item.NgayCham?.ToString("dd/MM/yyyy")</td>
+                        <td>@item.GioCham?.ToString("HH:mm:ss")</td>
+                        <td>@item.KieuCham</td>
+                        <td>@item.NguonCham</td>
+                        <td>@item.MaSoMay</td>
+                        <td>@item.TenMay</td>
                     </tr>
                     stt++;
                 }

@@ -14,9 +14,11 @@ namespace Timekeeping.Controllers
             _logger = logger;
             _chamCongCheckInOutV1Service = chamCongCheckInOutV1Service;
         }
-        public IActionResult Index()
+        [Route("QuanTri/DuLieuChamCong")]
+        public async Task<IActionResult> DuLieuChamCong(int pageIndex = 1, int pageSize = 20)
         {
-            return View();
+            var data = await _chamCongCheckInOutV1Service.GetAllAsync(pageIndex, pageSize);
+            return View("~/Views/QuanTri/DuLieuChamCong.cshtml", data);
         }
 
         [HttpGet]

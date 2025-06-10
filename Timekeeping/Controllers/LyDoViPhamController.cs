@@ -14,10 +14,12 @@ namespace Timekeeping.Controllers
             _logger = logger;
             _lyDoViPhamService = lyDoViPhamService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int pageIndex = 1, int pageSize = 20)
         {
-            return View();
+            var result = await _lyDoViPhamService.GetAllAsync(pageIndex, pageSize);
+            return View(result);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetLyDoViPham([FromQuery] int pageIndex, [FromQuery] int pageSize)
