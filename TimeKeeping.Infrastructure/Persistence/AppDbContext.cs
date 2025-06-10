@@ -40,6 +40,7 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<tb_vpcc_temp> tb_vpcc_temps { get; set; }
     public virtual DbSet<tb_GroupFunctionDetail> tb_GroupFunctionDetails { get; set; }
+    public virtual DbSet<tb_Account> tb_Accounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,6 +112,46 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ChucNangID).ValueGeneratedNever();
             entity.Property(e => e.TenChucNang).HasMaxLength(250);
         });
+
+        modelBuilder.Entity<tb_Account>(entity =>
+        {
+            entity.HasKey(e => e.ID).HasName("PK_tb_Account");
+
+            entity.ToTable("tb_Account");
+
+            entity.Property(e => e.ID)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.MaNhanVien)
+                .HasMaxLength(50)
+                .IsUnicode(false); 
+
+            entity.Property(e => e.FullName)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.UserName)
+                .IsRequired()
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.Property(e => e.HashPassword)
+                .IsRequired()
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            entity.Property(e => e.LastLogin)
+                .HasColumnType("datetime");
+
+            entity.HasOne(e => e.GroupFunction)
+                .WithMany(g => g.Accounts) 
+                .HasForeignKey(e => e.GroupFuncID)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_tb_Account_tb_GroupFunction");
+        });
+
 
         modelBuilder.Entity<tb_GroupFunction>(entity =>
         {
