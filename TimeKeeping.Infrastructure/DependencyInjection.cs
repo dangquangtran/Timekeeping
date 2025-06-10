@@ -26,6 +26,7 @@ namespace TimeKeeping.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ILyDoViPhamService, LyDoViPhamService>();
             services.AddScoped<IChamCongCheckInOutV1Service, ChamCongCheckInOutV1Service>();
+            services.AddScoped<IPermissionService, PermissionService>();
            // services.AddScoped<IAccountService, AccountService>();
            
             var jwtSecretKey = configuration["Jwt:SecretKey"];

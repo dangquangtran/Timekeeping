@@ -26,7 +26,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
 
         public async Task<IEnumerable<ChamCongCheckInOutV1GetViewModel>> GetAllAsync(int pageIndex, int pageSize)
         {
-            _logger.LogInformation("Bắt đầu lấy danh sách lý do vi phạm");
+            _logger.LogInformation("Bắt đầu lấy danh sách Chấm Công");
             try
             {
                 //var (pagedData, totalCount) = await _unitOfWork.ChamCong_CheckInOut_v1Repo.GetPagedAsync(pageIndex, pageSize);
@@ -104,7 +104,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                _logger.LogError(ex, "Lỗi khi lấy danh sách lý do vi phạm");
+                _logger.LogError(ex, "Lỗi khi lấy danh sách chấm công");
                 return Enumerable.Empty<ChamCongCheckInOutV1GetViewModel>();
             }
         }
