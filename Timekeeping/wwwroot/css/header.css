@@ -1,0 +1,47 @@
+﻿header {
+    border-bottom: 1.5px solid #e0e0e0; /* hoặc màu bạn muốn */
+    box-shadow: 0 4px 5px rgba(0,0,0,0.18); /* hiệu ứng đổ bóng nhẹ phía dưới */
+}
+
+.nav-link.custom-tab {
+    color: white;
+    padding: 5px 8px;
+    text-decoration: none;
+}
+
+.nav-link.custom-tab:hover {
+    background-color: #C1440E;
+}
+
+.profile {
+    color: white;
+}
+.dropdown-link {
+    color: black;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+}
+
+    .dropdown-link::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 3px;
+        left: 0;
+        bottom: -15px;
+        background-color: #00bfff; /* xanh dương */
+    }
+
+.dropdown-link:hover {
+    color: #00bfff;
+}
+    .dropdown-link:hover::after {
+        width: 100%;
+    }
+
+
+
+
+
+

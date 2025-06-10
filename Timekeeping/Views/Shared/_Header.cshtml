@@ -1,0 +1,64 @@
+﻿<link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
+<header class="border-bottom">
+    <div class="container-fluid d-flex row" style="background-color:#1d2452">
+        <div class="col-md-3"></div>
+        <nav class="nav col-md-5">
+            <a href="#" class="nav-link custom-tab">TRANG CHỦ</a>
+            <a href="#" class="nav-link custom-tab">GIẢI TRÌNH</a>
+            <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT
+                <i class="fa-solid fa-caret-down ms-1"></i>
+            </a>
+            <a href="#" class="nav-link custom-tab" data-target="approval-dropdown">XÉT DUYỆT
+                <i class="fa-solid fa-caret-down ms-1"></i>
+            </a>
+            <a href="#" class="nav-link custom-tab" data-target="report-dropdown">BÁO CÁO
+                <i class="fa-solid fa-caret-down ms-1"></i>
+            </a>
+            <a href="#" class="nav-link custom-tab" data-target="admin-dropdown">QUẢN TRỊ
+                <i class="fa-solid fa-caret-down ms-1"></i>
+            </a>
+        </nav>
+        <div class="profile d-flex align-items-center col-md-4 justify-content-center">
+            <div>
+                <i class="fa-solid fa-circle-user"></i>
+                <a href="/logout" class="text-white text-decoration-none">Đào Anh Dũng</a>
+            </div>
+            <div class="ms-3">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <a href="/logout" class="text-white">Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2">
+        <div class="logo col-md-3 d-flex justify-content-end">
+            <a href="/">
+                <img alt="" src="~/images/logo.png" style="width: 180px; height: 34px; margin-top: 0px;">
+            </a>
+        </div>
+        <div class="col-md-9 d-flex align-items-center">
+            <div id="update-dropdown" class="dropdown-content d-none">
+                <a href="#" class="dropdown-link me-3">Vi phạm khác</a>
+                <a href="#" class="dropdown-link me-3">Kỳ báo cáo</a>
+                <a href="#" class="dropdown-link me-3">Lý do vi phạm</a>
+            </div>
+            <div id="approval-dropdown" class="dropdown-content d-none">
+                <a href="#" class="dropdown-link me-3">Duyệt đơn vị</a>
+                <a href="#" class="dropdown-link me-3">Duyệt toàn hàng</a>
+            </div>
+            <div id="report-dropdown" class="dropdown-content d-none">
+                <a href="#" class="dropdown-link me-3">Chấm công vân tay</a>
+                <a href="#" class="dropdown-link me-3">Vi phạm khác</a>
+                <a href="#" class="dropdown-link me-3">Vi phạm cá nhân</a>
+                <a href="#" class="dropdown-link me-3">Vi phạm đơn vị</a>
+                <a href="#" class="dropdown-link me-3">Tổng hợp vi phạm</a>
+				<a href="#" class="dropdown-link me-3">Vi phạm ngày công</a>
+            </div>
+            <div id="admin-dropdown" class="dropdown-content d-none">
+                <a href="#" class="dropdown-link me-3">Phân quyền</a>
+                <a href="#" class="dropdown-link me-3">Dữ liệu chấm công</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script src="~/js/header.js" asp-append-version="true"></script>
