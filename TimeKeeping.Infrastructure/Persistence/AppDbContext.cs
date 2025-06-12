@@ -217,7 +217,7 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("tb_kybaocao");
 
-            entity.Property(e => e.maky).ValueGeneratedNever();
+            entity.Property(e => e.maky).ValueGeneratedOnAdd();
             entity.Property(e => e.tenky).HasMaxLength(500);
         });
 
