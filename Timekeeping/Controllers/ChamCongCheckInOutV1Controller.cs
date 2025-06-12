@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TimeKeeping.Application.Services;
+using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
@@ -26,6 +27,23 @@ namespace Timekeeping.Controllers
         {
             var result = await _chamCongCheckInOutV1Service.GetAllAsync(pageIndex, pageSize);
             return Ok(result);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ExportExcelDSChamCong([FromBody] ChamCongExportRequestViewModel chamCongExportRequestViewModel)
+        {
+            var result = await _chamCongCheckInOutV1Service.ExportChamCongToExcelAsync(chamCongExportRequestViewModel);
+            //return Ok(result);
+            if (result == null || result.Length == 0)
+            {
+                return BadRequest("Không có dữ liệu chấm công phù hợp với yêu cầu.");
+            }
+            return File(
+        result,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        $"ChamCong_{chamCongExportRequestViewModel.Thang}_{chamCongExportRequestViewModel.Nam}.xlsx"
+    );
         }
     }
 }

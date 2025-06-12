@@ -10,5 +10,6 @@ namespace TimeKeeping.Application.Services
     public interface IChamCongCheckInOutV1Service
     {
         Task<IEnumerable<ChamCongCheckInOutV1GetViewModel>> GetAllAsync(int pageIndex, int pageSize);
+        Task<byte[]> ExportChamCongToExcelAsync(ChamCongExportRequestViewModel chamCongExportRequestViewModel);
     }
 }
