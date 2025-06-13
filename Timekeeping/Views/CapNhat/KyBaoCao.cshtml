@@ -1,20 +1,18 @@
 ﻿@model TimeKeeping.Application.ViewModels.BaoCaokiViewModel.KyBaoCaoPageViewModel
 
-@{
-    ViewData["Title"] = "Giải trình chấm công và báo cáo";
-}
-
+<link rel="stylesheet" href="~/css/ky-bao-cao.css" asp-append-version="true" />
 <div class="container">
-
     <p class="border-bottom mb-5">Cập nhật/Kỳ báo cáo</p>
-    <h5 class="text-center" style="color: #ef4e24"><strong>CẬP NHẬT KỲ BÁO CÁO</strong></h5>
+    <h4 class="text-center" style="color: #ef4e24"><strong>CẬP NHẬT KỲ BÁO CÁO</strong></h4>
     <div class="row d-flex">
         <div class="col-md-4">
-            <p class="text-center" style="color: #ef4e24"><strong>TẠO KỲ BÁO CÁO MỚI</strong></p>
-            <form asp-controller="BaoCaoki" asp-action="CreateBaoCaoKi" method="post" class="text-start border p-3 rounded bg-light">
+            <form asp-controller="BaoCaoki" asp-action="CreateBaoCaoKi" method="post" class="text-start border p-3 rounded bg-light form-create">
+                <h5 style="color: #00bfff"><strong>Thêm kỳ báo cáo</strong></h5>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="mb-2">
                     <label class="form-label">Tên kỳ</label>
                     <input asp-for="CreateModel.tenky" class="form-control" required />
+                    <span asp-validation-for="CreateModel.tenky" class="text-danger"></span>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Từ ngày</label>
@@ -36,10 +34,30 @@
                     <label class="form-label">Ngày tự động đóng</label>
                     <input asp-for="CreateModel.ngaydong_auto" class="form-control" type="date" />
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Tạo mới</button>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary w-100">XÁC NHẬN</button>
+                    <button type="reset" class="btn-reset">LÀM MỚI</button>
+                </div>
+                <input type="hidden" asp-for="PageIndex" />
+                <input type="hidden" asp-for="PageSize" />
             </form>
         </div>
         <div class="col-md-8">
+            <h5 style="color: #00bfff"><strong>Thêm kỳ báo cáo</strong></h5>
+            <div class="d-flex justify-content-end align-items-center">
+                <p>Chọn số dòng</p>
+                <form method="get" asp-action="KyBaoCao" class="d-flex justify-content-end align-items-center mb-2" style="gap:8px">
+    <select name="pageSize" class="form-select w-auto ms-2" onchange="this.form.submit()">
+                        <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
+                        <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
+                        <option value="50" selected="@(Model.PageSize == 50 ? "selected" : null)">50</option>
+                        <option value="100" selected="@(Model.PageSize == 100 ? "selected" : null)">100</option>
+
+    </select>
+    <input type="hidden" name="pageIndex" value="1" />
+</form>
+
+            </div>
             <table class="table table-bordered table-hover" style="border-color:#00bfff">
                 <thead class="text-center justify-content-center" style="background-color: lightgray">
                 <tr class="align-middle">
@@ -84,6 +102,18 @@
                 </tbody>
 
             </table>
+
+            <div class="custom-pagination-wrapper">
+                <form method="get" asp-action="KyBaoCao" class="custom-pagination">
+                    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+                    <button class="custom-page-btn" name="pageIndex" value="1" @(Model.PageIndex == 1 ? "disabled" : "") title="Trang đầu">&laquo;|</button>
+                    <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)" @(Model.PageIndex == 1 ? "disabled" : "") title="Trang trước">&lsaquo;</button>
+                    <span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+                    <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)" @(Model.PageIndex == Model.TotalPages ? "disabled" : "") title="Trang sau">&rsaquo;</button>
+                    <button class="custom-page-btn" name="pageIndex" value="@Model.TotalPages" @(Model.PageIndex == Model.TotalPages ? "disabled" : "") title="Trang cuối">|&raquo;</button>
+                </form>
+            </div>
+
 
         </div>
     </div>

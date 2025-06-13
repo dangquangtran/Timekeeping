@@ -18,17 +18,22 @@ namespace Timekeeping.Controllers
         }
 
         [Route("CapNhat/KyBaoCao")]
-        public async Task<IActionResult> KyBaoCao(int pageIndex = 1, int pageSize = 20)
+        public async Task<IActionResult> KyBaoCao(int pageIndex = 1, int pageSize = 10)
         {
-            var list = await _baoCaokiService.GetAllAsync(pageIndex, pageSize);
+            var (list, totalCount) = await _baoCaokiService.GetAllAsync(pageIndex, pageSize);
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
             var vm = new KyBaoCaoPageViewModel
             {
                 CreateModel = new BaoCaokiCreateViewModel(),
-                List = list
+                List = list,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalPages = totalPages
             };
             return View("~/Views/CapNhat/KyBaoCao.cshtml", vm);
-
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetBaoCaoKi([FromQuery] int pageIndex, [FromQuery] int pageSize)
@@ -40,10 +45,35 @@ namespace Timekeeping.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBaoCaoKi(KyBaoCaoPageViewModel model)
         {
-            var createModel = model.CreateModel;
-            await _baoCaokiService.CreateBaoCaoKiAsync(createModel);
-            return RedirectToAction("KyBaoCao");
+            try
+            {
+                await _baoCaokiService.CreateBaoCaoKiAsync(model.CreateModel);
+                return RedirectToAction("KyBaoCao");
+            }
+            catch (Exception ex)
+            {
+                // Lỗi nghiệp vụ: tên kỳ đã tồn tại
+                if (ex.Message.Contains("đã tồn tại", StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("CreateModel.tenky", ex.Message);
+                }
+                else // Lỗi hệ thống
+                {
+                    ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+
+                // Lấy lại danh sách để hiển thị bảng
+                int pageIndex = model.PageIndex > 0 ? model.PageIndex : 1;
+                int pageSize = model.PageSize > 0 ? model.PageSize : 10;
+                var (list, totalCount) = await _baoCaokiService.GetAllAsync(pageIndex, pageSize);
+                model.List = list;
+                model.PageIndex = pageIndex;
+                model.PageSize = pageSize;
+                model.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+                return View("~/Views/CapNhat/KyBaoCao.cshtml", model);
+            }
         }
+
 
 
     }

@@ -9,7 +9,7 @@ namespace TimeKeeping.Application.Services
 {
     public interface IBaoCaokiService
     {
-        Task<IEnumerable<BaoCaokiGetViewModel>> GetAllAsync(int pageIndex, int pageSize);
+        Task<(IEnumerable<BaoCaokiGetViewModel> List, int TotalCount)> GetAllAsync(int pageIndex, int pageSize);
         Task<IEnumerable<BaoCaokiCreateViewModel>> CreateBaoCaoKiAsync(BaoCaokiCreateViewModel baoCaokiCreateViewModel);
     }
 }

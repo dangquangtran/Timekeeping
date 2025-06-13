@@ -27,15 +27,12 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<BaoCaokiGetViewModel>> GetAllAsync(int pageIndex, int pageSize)
+        public async Task<(IEnumerable<BaoCaokiGetViewModel> List, int TotalCount)> GetAllAsync(int pageIndex, int pageSize)
         {
             _logger.LogInformation("Bắt đầu lấy báo cáo kì");
-
             try
             {
-
                 var (pagedData, totalCount) = await _unitOfWork.KyBaoCaoRepo.GetPagedAsync(pageIndex, pageSize);
-
                 var trangthaiList = await _unitOfWork.TrangThaiKyRepo.GetAllAsync();
                 var today = DateOnly.FromDateTime(DateTime.Now);
 
@@ -49,15 +46,14 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                     ngay_duyet = c.ngay_duyet,
                     ngaydong_auto = c.ngaydong_auto,
                     TrangThai = (c.ngaydong_auto.HasValue && today >= c.ngaydong_auto.Value)
-                    ? trangthaiList.FirstOrDefault(t => t.trangthaiid == 2)?.trangthaiten 
-                    : trangthaiList.FirstOrDefault(t => t.trangthaiid == 1)?.trangthaiten 
+                        ? trangthaiList.FirstOrDefault(t => t.trangthaiid == 2)?.trangthaiten
+                        : trangthaiList.FirstOrDefault(t => t.trangthaiid == 1)?.trangthaiten
                 })
-                    .OrderByDescending(vm => vm.denngay ?? DateOnly.MinValue)
-                    .ThenBy(cm=> cm.TrangThai == "Mở" ? 0: 1)
-                    .ToList();
+                .OrderByDescending(vm => vm.denngay ?? DateOnly.MinValue)
+                .ThenBy(cm => cm.TrangThai == "Mở" ? 0 : 1)
+                .ToList();
 
-                return result;
-
+                return (result, totalCount);
             }
             catch (Exception ex)
             {
@@ -66,7 +62,8 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 throw new Exception(ex.Message);
             }
         }
-        
+
+
         public async Task<IEnumerable<BaoCaokiCreateViewModel>> CreateBaoCaoKiAsync(BaoCaokiCreateViewModel baoCaokiCreateViewModel)
         {
             _logger.LogInformation("Bắt đầu tạo báo cáo kì");

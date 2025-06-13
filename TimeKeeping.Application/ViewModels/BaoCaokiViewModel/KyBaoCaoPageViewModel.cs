@@ -10,6 +10,9 @@ namespace TimeKeeping.Application.ViewModels.BaoCaokiViewModel
     {
         public BaoCaokiCreateViewModel CreateModel { get; set; } = new BaoCaokiCreateViewModel();
         public IEnumerable<BaoCaokiGetViewModel> List { get; set; } = new List<BaoCaokiGetViewModel>();
+        public int PageIndex { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int TotalPages { get; set; } = 1;
     }
 
 }
