@@ -187,5 +187,49 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             }
         }
 
+        public async Task<IEnumerable<ListKyGetViewModel>> GetAllKyAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các kỳ");
+            try
+            {
+                var danhSachKy = await _unitOfWork.KyBaoCaoRepo.GetAllAsync();
+
+                var result = danhSachKy.Select(x => new ListKyGetViewModel
+                {
+                    ky = x.tenky,
+
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các kỳ ");
+                return Enumerable.Empty<ListKyGetViewModel>();
+            }
+        }
+
+        public async Task<IEnumerable<ListDonViGetViewModel>> GetAllDonViAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các đơn vị");
+            try
+            {
+                var danhSachKy = await _unitOfWork.DonViRepo.GetAllAsync();
+
+                var result = danhSachKy.Select(x => new ListDonViGetViewModel
+                {
+                    DonVi = x.tendv,
+
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các đơn vị");
+                return Enumerable.Empty<ListDonViGetViewModel>();
+            }
+        }
+
     }
 }

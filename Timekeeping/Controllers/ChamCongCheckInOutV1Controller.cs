@@ -45,5 +45,19 @@ namespace Timekeeping.Controllers
         $"ChamCong_{chamCongExportRequestViewModel.Thang}_{chamCongExportRequestViewModel.Nam}.xlsx"
     );
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDanhSachKy()
+        {
+            var result = await _chamCongCheckInOutV1Service.GetAllKyAsync();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDanhSachDonVi()
+        {
+            var result = await _chamCongCheckInOutV1Service.GetAllDonViAsync();
+            return Ok(result);
+        }
     }
 }
