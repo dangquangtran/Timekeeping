@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Helpers;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Infrastructure.ServiceImpls;
@@ -39,10 +40,14 @@ namespace Timekeeping.Controllers
             {
                 return BadRequest("Không có dữ liệu chấm công phù hợp với yêu cầu.");
             }
+            if (!KyParserHelper.TryParseKy(chamCongExportRequestViewModel.Ky, out int thang, out int nam))
+            {
+                return BadRequest("Kỳ không hợp lệ. Định dạng đúng là 'Tháng 6/2025'.");
+            }
             return File(
         result,
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        $"ChamCong_{chamCongExportRequestViewModel.Thang}_{chamCongExportRequestViewModel.Nam}.xlsx"
+        $"ChamCong_{thang}_{nam}.xlsx"
     );
         }
 

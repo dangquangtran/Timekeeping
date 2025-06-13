@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeKeeping.Application.Helpers;
 using TimeKeeping.Application.Interfaces;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
@@ -81,15 +82,20 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
 
             try
             {
+                if (!KyParserHelper.TryParseKy(request.Ky, out int thang, out int nam))
+                {
+                    _logger.LogWarning("Kỳ không hợp lệ: {Ky}", request.Ky);
+                    return Array.Empty<byte>();
+                }
                 // Lấy toàn bộ dữ liệu chấm công trong tháng/năm
                 var data = await _unitOfWork.ChamCong_CheckInOut_v1Repo
                     .GetByConditionAsync(c => c.NgayCham.HasValue &&
-                                              c.NgayCham.Value.Month == request.Thang &&
-                                              c.NgayCham.Value.Year == request.Nam);
+                                              c.NgayCham.Value.Month == thang &&
+                                              c.NgayCham.Value.Year == nam);
 
                 if (!data.Any())
                 {
-                    _logger.LogWarning("Không có dữ liệu chấm công cho tháng {Thang} năm {Nam}", request.Thang, request.Nam);
+                    _logger.LogWarning("Không có dữ liệu chấm công cho tháng {Thang} năm {Nam}", thang, nam);
                     return Array.Empty<byte>();
                 }
 
