@@ -7,10 +7,15 @@
     color: white;
     padding: 5px 8px;
     text-decoration: none;
+    position: relative;
 }
 
 .nav-link.custom-tab:hover {
     background-color: #C1440E;
+}
+
+.nav-link.custom-tab:hover .menu-triangle {
+    border-top-color: #C1440E;
 }
 
 .profile {
@@ -39,6 +44,20 @@
     .dropdown-link:hover::after {
         width: 100%;
     }
+
+.menu-triangle {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #1d2452;
+    z-index: 10;
+}
 
 
 
