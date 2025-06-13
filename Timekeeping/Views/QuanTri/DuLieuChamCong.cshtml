@@ -7,13 +7,13 @@
 
 <div class="container">
     <p class="border-bottom mb-5">Quản trị/Dữ liệu chấm công</p>
-    <h5 class="text-center" style="color: #ef4e24"><strong>THÔNG TIN CHUNG</strong></h5>
-    <table class="table table-bordered" style="border-color:#00bfff">
+    <h5 class="text-center" style="color: #ef4e24"><strong>DỮ LIỆU CHẤM CÔNG</strong></h5>
+    <table class="table table-bordered table-hover" style="border-color:#00bfff">
         <thead class="text-center" style="background-color: lightgray">
             <tr>
                 <th>STT</th>
-                <th>Mã chấm công</th>
-                <th>Họ tên</th>
+                <th>Tên kỳ</th>
+                <th>Thời gian</th>
                 <th>Chức danh</th>
                 <th>Đơn vị</th>
                 <th>Ngày chấm</th>
@@ -28,12 +28,12 @@
                 {
                     <tr>
                         <td>@stt</td>
-                      @*   <td>@item.MaNhanVien</td>
-                        <td>@item.NgayCham?.ToString("dd/MM/yyyy")</td>
-                        <td>@item.GioCham?.ToString("HH:mm:ss")</td>
-                        <td>@item.KieuCham</td>
-                        <td>@item.NguonCham</td>
-                        <td>@item.MaSoMay</td> *@
+                        <td>@item.MaChamCong</td>
+                        <td>@item.HoTen</td>
+                        <td>@item.ChucDanh</td>
+                        <td>@item.DonVi</td>
+                        <td>@item.NgayCham</td>
+                        <td>@item.GioCham</td>
                         <td>@item.TenMay</td>
                     </tr>
                     stt++;
@@ -47,4 +47,5 @@
             }
         </tbody>
     </table>
+    <button class="mt-2">Export Excel</button>
 </div>

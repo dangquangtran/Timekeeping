@@ -1,26 +1,17 @@
 ﻿<link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
 <header class="border-bottom mb-3">
-    <div class="container-fluid d-flex row m-0 p-0" style="background-color:#1d2452">
+    <div class="container-fluid d-flex row m-0 p-0" style="background-color:#1d2452; position: relative;">
         <div class="col-md-3"></div>
-        <nav class="nav col-md-5">
+        <nav class="nav col-md-5 justify-content-center" style="z-index:2;">
             <a href="/" class="nav-link custom-tab">TRANG CHỦ</a>
             <a href="#" class="nav-link custom-tab">GIẢI TRÌNH</a>
-            <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT
-                <i class="fa-solid fa-caret-down ms-1"></i>
-            </a>
-            <a href="#" class="nav-link custom-tab" data-target="approval-dropdown">XÉT DUYỆT
-                <i class="fa-solid fa-caret-down ms-1"></i>
-            </a>
-            <a href="#" class="nav-link custom-tab" data-target="report-dropdown">BÁO CÁO
-                <i class="fa-solid fa-caret-down ms-1"></i>
-            </a>
-            <a href="#" class="nav-link custom-tab" data-target="admin-dropdown">QUẢN TRỊ
-                <i class="fa-solid fa-caret-down ms-1"></i>
-            </a>
+            <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT<span class="menu-triangle"></span></a>
+            <a href="#" class="nav-link custom-tab" data-target="approval-dropdown">XÉT DUYỆT<span class="menu-triangle"></span></a>
+            <a href="#" class="nav-link custom-tab" data-target="report-dropdown">BÁO CÁO<span class="menu-triangle"></span></a>
+            <a href="#" class="nav-link custom-tab" data-target="admin-dropdown">QUẢN TRỊ<span class="menu-triangle"></span></a>
         </nav>
         <div class="profile d-flex align-items-center col-md-4 justify-content-center">
             <div>
-                
                 <a href="/logout" class="text-white text-decoration-none">
                     <i class="fa-solid fa-circle-user pe-1"></i>Đào Anh Dũng</a>
             </div>
@@ -40,7 +31,7 @@
         <div class="col-md-9 d-flex align-items-center px-2">
             <div id="update-dropdown" class="dropdown-content d-none">
                 <a href="#" class="dropdown-link me-3">Vi phạm khác</a>
-                <a href="#" class="dropdown-link me-3">Kỳ báo cáo</a>
+                <a href="/CapNhat/KyBaoCao" class="dropdown-link me-3">Kỳ báo cáo</a>
                 <a href="#" class="dropdown-link me-3">Lý do vi phạm</a>
             </div>
             <div id="approval-dropdown" class="dropdown-content d-none">

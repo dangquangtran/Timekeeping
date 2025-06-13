@@ -81,13 +81,13 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 }
                 var newBaoCaoKi = new tb_kybaocao
                 {
-                   // maky = baoCaokiCreateViewModel.maky,
+                    // maky = baoCaokiCreateViewModel.maky,
                     tenky = baoCaokiCreateViewModel.tenky,
-                    tungay = baoCaokiCreateViewModel.tungay,
-                    denngay = baoCaokiCreateViewModel.denngay,
-                    ngaydong_giaitrinh = baoCaokiCreateViewModel.ngaydong_giaitrinh,
-                    ngay_duyet = baoCaokiCreateViewModel.ngay_duyet,
-                    ngaydong_auto = baoCaokiCreateViewModel.ngaydong_auto,
+                    tungay = baoCaokiCreateViewModel.tungay.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.tungay.Value) : (DateOnly?)null,
+                    denngay = baoCaokiCreateViewModel.denngay.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.denngay.Value) : (DateOnly?)null,
+                    ngaydong_giaitrinh = baoCaokiCreateViewModel.ngaydong_giaitrinh.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.ngaydong_giaitrinh.Value) : (DateOnly?)null,
+                    ngay_duyet = baoCaokiCreateViewModel.ngay_duyet.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.ngay_duyet.Value) : (DateOnly?)null,
+                    ngaydong_auto = baoCaokiCreateViewModel.ngaydong_auto.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.ngaydong_auto.Value) : (DateOnly?)null,
                 };
 
                 await _unitOfWork.KyBaoCaoRepo.AddAsync(newBaoCaoKi);
@@ -98,12 +98,13 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 {
                     //maky = newBaoCaoKi.maky,
                     tenky = newBaoCaoKi.tenky,
-                    tungay = newBaoCaoKi.tungay,
-                    denngay = newBaoCaoKi.denngay,
-                    ngaydong_giaitrinh = newBaoCaoKi.ngaydong_giaitrinh,
-                    ngay_duyet = newBaoCaoKi.ngay_duyet,
-                    ngaydong_auto = newBaoCaoKi.ngaydong_auto,
+                    tungay = newBaoCaoKi.tungay.HasValue ? newBaoCaoKi.tungay.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                    denngay = newBaoCaoKi.denngay.HasValue ? newBaoCaoKi.denngay.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                    ngaydong_giaitrinh = newBaoCaoKi.ngaydong_giaitrinh.HasValue ? newBaoCaoKi.ngaydong_giaitrinh.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                    ngay_duyet = newBaoCaoKi.ngay_duyet.HasValue ? newBaoCaoKi.ngay_duyet.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                    ngaydong_auto = newBaoCaoKi.ngaydong_auto.HasValue ? newBaoCaoKi.ngaydong_auto.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
                 };
+
 
                 return new List<BaoCaokiCreateViewModel> { result };
             }

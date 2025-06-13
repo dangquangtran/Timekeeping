@@ -1,0 +1,90 @@
+﻿@model TimeKeeping.Application.ViewModels.BaoCaokiViewModel.KyBaoCaoPageViewModel
+
+@{
+    ViewData["Title"] = "Giải trình chấm công và báo cáo";
+}
+
+<div class="container">
+
+    <p class="border-bottom mb-5">Cập nhật/Kỳ báo cáo</p>
+    <h5 class="text-center" style="color: #ef4e24"><strong>CẬP NHẬT KỲ BÁO CÁO</strong></h5>
+    <div class="row d-flex">
+        <div class="col-md-4">
+            <p class="text-center" style="color: #ef4e24"><strong>TẠO KỲ BÁO CÁO MỚI</strong></p>
+            <form asp-controller="BaoCaoki" asp-action="CreateBaoCaoKi" method="post" class="text-start border p-3 rounded bg-light">
+                <div class="mb-2">
+                    <label class="form-label">Tên kỳ</label>
+                    <input asp-for="CreateModel.tenky" class="form-control" required />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Từ ngày</label>
+                    <input asp-for="CreateModel.tungay" class="form-control" type="date" required />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Đến ngày</label>
+                    <input asp-for="CreateModel.denngay" class="form-control" type="date" required />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Ngày đóng giải trình</label>
+                    <input asp-for="CreateModel.ngaydong_giaitrinh" class="form-control" type="date" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Ngày duyệt</label>
+                    <input asp-for="CreateModel.ngay_duyet" class="form-control" type="date" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Ngày tự động đóng</label>
+                    <input asp-for="CreateModel.ngaydong_auto" class="form-control" type="date" />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Tạo mới</button>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <table class="table table-bordered table-hover" style="border-color:#00bfff">
+                <thead class="text-center justify-content-center" style="background-color: lightgray">
+                <tr class="align-middle">
+                        <th rowspan="2">STT</th>
+                        <th rowspan="2">Tên kỳ</th>
+                        <th colspan="2">Thời gian</th>
+                        <th rowspan="2">Trạng thái</th>
+                        <th rowspan="2">Ngày đóng giải trình</th>
+                        <th rowspan="2">Ngày duyệt</th>
+                        <th rowspan="2">Ngày tự động đóng</th>
+                    </tr>
+                    <tr>
+                        <th>Từ ngày</th>
+                        <th>Đến ngày</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.List != null && Model.List.Any())
+                    {
+                        var stt = 1;
+                        foreach (var item in Model.List)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>@item.tenky</td>
+                                <td>@item.tungay?.ToString("dd/MM/yyyy")</td>
+                                <td>@item.denngay?.ToString("dd/MM/yyyy")</td>
+                                <td>@item.TrangThai</td>
+                                <td>@item.ngaydong_giaitrinh?.ToString("dd/MM/yyyy")</td>
+                                <td>@item.ngay_duyet?.ToString("dd/MM/yyyy")</td>
+                                <td>@item.ngaydong_auto?.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-danger">Không có dữ liệu</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>

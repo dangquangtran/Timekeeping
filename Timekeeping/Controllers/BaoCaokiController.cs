@@ -16,9 +16,18 @@ namespace Timekeeping.Controllers
             _baoCaokiService = baoCaokiService;
             _logger = logger;
         }
-        public IActionResult Index()
+
+        [Route("CapNhat/KyBaoCao")]
+        public async Task<IActionResult> KyBaoCao(int pageIndex = 1, int pageSize = 20)
         {
-            return View();
+            var list = await _baoCaokiService.GetAllAsync(pageIndex, pageSize);
+            var vm = new KyBaoCaoPageViewModel
+            {
+                CreateModel = new BaoCaokiCreateViewModel(),
+                List = list
+            };
+            return View("~/Views/CapNhat/KyBaoCao.cshtml", vm);
+
         }
 
         [HttpGet]
@@ -29,10 +38,13 @@ namespace Timekeeping.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBaoCaoKi([FromBody] BaoCaokiCreateViewModel  baoCaokiCreateViewModel)
+        public async Task<IActionResult> CreateBaoCaoKi(KyBaoCaoPageViewModel model)
         {
-            var result = await _baoCaokiService.CreateBaoCaoKiAsync(baoCaokiCreateViewModel);
-            return Ok(result);
+            var createModel = model.CreateModel;
+            await _baoCaokiService.CreateBaoCaoKiAsync(createModel);
+            return RedirectToAction("KyBaoCao");
         }
+
+
     }
 }
