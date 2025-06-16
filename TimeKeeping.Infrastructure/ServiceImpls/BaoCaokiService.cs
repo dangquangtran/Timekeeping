@@ -69,7 +69,24 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             _logger.LogInformation("Bắt đầu tạo báo cáo kì");
             try
             {
-                var existingTenKi = await _unitOfWork.KyBaoCaoRepo.FirstOrDefaultAsync(a => a.tenky == baoCaokiCreateViewModel.tenky);
+
+                // Kiểm tra tungay và denngay
+                if (!baoCaokiCreateViewModel.tungay.HasValue || !baoCaokiCreateViewModel.denngay.HasValue)
+                {
+                    throw new Exception("'tungay' và 'denngay' là bắt buộc.");
+                }
+                var fromDate = baoCaokiCreateViewModel.tungay.Value;
+                var toDate = baoCaokiCreateViewModel.denngay.Value;
+
+                if (fromDate.Month != toDate.Month || fromDate.Year != toDate.Year)
+                {
+                    throw new Exception("'tungay' và 'denngay' phải nằm trong cùng một tháng và năm.");
+                }
+
+                var generatedTenKy = $"Tháng {fromDate.Month}/{fromDate.Year}";
+
+
+                var existingTenKi = await _unitOfWork.KyBaoCaoRepo.FirstOrDefaultAsync(a => a.tenky == generatedTenKy);
 
                 if (existingTenKi != null)
                 {
@@ -79,7 +96,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var newBaoCaoKi = new tb_kybaocao
                 {
                     // maky = baoCaokiCreateViewModel.maky,
-                    tenky = baoCaokiCreateViewModel.tenky,
+                    tenky = generatedTenKy,
                     tungay = baoCaokiCreateViewModel.tungay.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.tungay.Value) : (DateOnly?)null,
                     denngay = baoCaokiCreateViewModel.denngay.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.denngay.Value) : (DateOnly?)null,
                     ngaydong_giaitrinh = baoCaokiCreateViewModel.ngaydong_giaitrinh.HasValue ? DateOnly.FromDateTime(baoCaokiCreateViewModel.ngaydong_giaitrinh.Value) : (DateOnly?)null,
@@ -94,7 +111,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var result = new BaoCaokiCreateViewModel
                 {
                     //maky = newBaoCaoKi.maky,
-                    tenky = newBaoCaoKi.tenky,
+                    tenky = generatedTenKy,
                     tungay = newBaoCaoKi.tungay.HasValue ? newBaoCaoKi.tungay.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
                     denngay = newBaoCaoKi.denngay.HasValue ? newBaoCaoKi.denngay.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
                     ngaydong_giaitrinh = newBaoCaoKi.ngaydong_giaitrinh.HasValue ? newBaoCaoKi.ngaydong_giaitrinh.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
