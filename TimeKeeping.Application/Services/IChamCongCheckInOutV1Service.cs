@@ -13,5 +13,6 @@ namespace TimeKeeping.Application.Services
         Task<byte[]> ExportChamCongToExcelAsync(ChamCongExportRequestViewModel chamCongExportRequestViewModel);
         Task<IEnumerable<ListKyGetViewModel>> GetAllKyAsync();
         Task<IEnumerable<ListDonViGetViewModel>> GetAllDonViAsync();
+        Task<(IEnumerable<ChamCongCheckInOutV1GetViewModel> List, int TotalPages)> GetFilteredAsync(int pageIndex, int pageSize, FilterChamCongViewModel filter);
     }
 }

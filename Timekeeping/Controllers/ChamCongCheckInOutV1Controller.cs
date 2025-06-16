@@ -64,5 +64,14 @@ namespace Timekeeping.Controllers
             var result = await _chamCongCheckInOutV1Service.GetAllDonViAsync();
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDanhSachChamCongFilter([FromQuery] int pageIndex, [FromQuery] int pageSize, FilterChamCongViewModel filter)
+        {
+            var result = await _chamCongCheckInOutV1Service.GetFilteredAsync(pageIndex,pageSize,filter);
+            var (list, totalPages) = result;
+
+            return Ok(new { List = list, TotalPages = totalPages });
+        }
     }
 }

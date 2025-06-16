@@ -237,5 +237,84 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             }
         }
 
+        public async Task<(IEnumerable<ChamCongCheckInOutV1GetViewModel> List, int TotalPages)> GetFilteredAsync(int pageIndex, int pageSize, FilterChamCongViewModel filter)
+        {
+            _logger.LogInformation("Bắt đầu lấy danh sách Chấm Công với bộ lọc");
+
+            try
+            {
+                //var (pagedData, totalCount) = await _unitOfWork.ChamCong_CheckInOut_v1Repo.GetPagedAsync(pageIndex, pageSize);
+                var allData = await _unitOfWork.ChamCong_CheckInOut_v1Repo.GetAllAsync();
+                // Lấy mã nhân viên
+                var maNhanViens = allData.Select(c => c.MaNhanVien).Distinct().ToList();
+                var accounts = await _unitOfWork.AccountRepo.GetByConditionAsync(a => maNhanViens.Contains(a.MaNhanVien));
+                var donVis = await _unitOfWork.DonViRepo.GetByConditionAsync(d => accounts.Select(a => a.MaDv).Contains(d.madv));
+
+                var accountDict = accounts.ToDictionary(a => a.MaNhanVien);
+                var donViDict = donVis.ToDictionary(d => d.madv, d => d.tendv);
+
+                // Ánh xạ dữ liệu có DonVi để dùng filter
+                var mappedData = allData.Select(c =>
+                {
+                    var acc = accountDict.GetValueOrDefault(c.MaNhanVien);
+                    var donVi = acc != null ? donViDict.GetValueOrDefault(acc.MaDv) : null;
+                    return new
+                    {
+                        ChamCong = c,
+                        Account = acc,
+                        DonVi = donVi
+                    };
+                });
+
+                // Filter theo kỳ
+                if (!string.IsNullOrWhiteSpace(filter.Ky) &&
+                    KyParserHelper.TryParseKy(filter.Ky, out int thang, out int nam))
+                {
+                    mappedData = mappedData.Where(x => x.ChamCong.NgayCham.HasValue &&
+                                                       x.ChamCong.NgayCham.Value.Month == thang &&
+                                                       x.ChamCong.NgayCham.Value.Year == nam);
+                }
+
+                // Filter theo tên đơn vị
+                if (!string.IsNullOrWhiteSpace(filter.DonVi))
+                {
+                    var donViFilter = filter.DonVi.Trim().ToLower();
+                    mappedData = mappedData.Where(x => !string.IsNullOrWhiteSpace(x.DonVi) &&
+                                                       x.DonVi.ToLower().Contains(donViFilter));
+                }
+
+                // Sau khi filter, tính lại totalCount & phân trang lại (trong RAM)
+                var filteredList = mappedData.ToList();
+                var totalFiltered = filteredList.Count;
+                var pagedResult = filteredList
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(x =>
+                    {
+                        return new ChamCongCheckInOutV1GetViewModel
+                        {
+                            MaChamCong = x.ChamCong.ID,
+                            HoTen = x.Account?.FullName,
+                            ChucDanh = x.Account?.ChucVu,
+                            DonVi = x.DonVi,
+                            NgayCham = x.ChamCong.NgayCham?.ToString("dd/MM/yyyy"),
+                            GioCham = x.ChamCong.GioCham?.ToString("HH:mm:ss"),
+                            TenMay = x.ChamCong.TenMay,
+                        };
+                    }).ToList();
+
+                var totalPages = (int)Math.Ceiling(totalFiltered / (double)pageSize);
+
+                return (pagedResult, totalPages);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                _logger.LogError(ex, "Lỗi khi lấy danh sách chấm công có filter");
+                return (Enumerable.Empty<ChamCongCheckInOutV1GetViewModel>(), 0);
+            }
+        }
+
+
     }
 }
