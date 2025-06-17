@@ -332,10 +332,8 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<tb_vpcc_temp>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("tb_vpcc_temp");
-
+            entity.HasKey(e => e.viphamid).HasName("PK_tb_vpcc_temp");
+            entity.ToTable("tb_vpcc_temp");
             entity.Property(e => e.chucdanh).HasMaxLength(500);
             entity.Property(e => e.hoten).HasMaxLength(50);
             entity.Property(e => e.madv)

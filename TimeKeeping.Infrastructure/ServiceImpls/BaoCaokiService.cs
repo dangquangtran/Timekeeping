@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DocumentFormat.OpenXml.Office2021.DocumentTasks;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,6 +94,15 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                     _logger.LogWarning("Tên Kì đã tồn tại: " + baoCaokiCreateViewModel.tenky);
                     throw new Exception("Tên Kì đã tồn tại.");
                 }
+
+                var dataInMonth = await _unitOfWork.ChamCong_CheckInOut_v1Repo.GetByConditionAsync(x =>
+                                 x.NgayCham >= fromDate && x.NgayCham <= toDate);
+
+                if (!dataInMonth.Any())
+                {
+                    throw new Exception($"Không có dữ liệu chấm công nào trong tháng {fromDate.Month}/{fromDate.Year}.");
+                }
+
                 var newBaoCaoKi = new tb_kybaocao
                 {
                     // maky = baoCaokiCreateViewModel.maky,
@@ -106,6 +116,9 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
 
                 await _unitOfWork.KyBaoCaoRepo.AddAsync(newBaoCaoKi);
                 await _unitOfWork.SaveChangesAsync();
+
+                await CheckViPhamAsync1(fromDate, toDate, newBaoCaoKi.maky);
+
                 await _unitOfWork.CommitTransactionAsync();
 
                 var result = new BaoCaokiCreateViewModel
@@ -124,10 +137,229 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             }
             catch (Exception ex) 
             {
-                await _unitOfWork.RollbackTransactionAsync();
+               // await _unitOfWork.RollbackTransactionAsync();
                 _logger.LogError(ex.Message);
                 throw new Exception(ex.Message);
             }
         }
+
+        public async System.Threading.Tasks.Task CheckViPhamAsync(DateTime fromDate, DateTime toDate, int maky)
+        {
+            var dataInMonth = await _unitOfWork.ChamCong_CheckInOut_v1Repo
+                .GetByConditionAsync(x => x.NgayCham >= fromDate && x.NgayCham <= toDate);
+            var fromDateOnly = DateOnly.FromDateTime(fromDate);
+            var toDateOnly = DateOnly.FromDateTime(toDate);
+            var nghiPhepList = await _unitOfWork.NghiPhepRepo
+                .GetByConditionAsync(x => x.NGAY >= fromDateOnly && x.NGAY <= toDateOnly);
+
+            var groupData = dataInMonth.GroupBy(x => new { x.MaNhanVien, Ngay = x.NgayCham.Value.Date });
+
+
+            _logger.LogInformation($"Số bản ghi chấm công trong kỳ: {dataInMonth.Count()}");
+            _logger.LogInformation($"Tổng số group NV/ngày: {groupData.Count()}");
+
+            foreach (var group in groupData)
+            {
+                var maNV = group.Key.MaNhanVien;
+                var ngayCham = group.Key.Ngay;
+                var checkin = group.Min(x => x.GioCham);
+                var checkout = group.Max(x => x.GioCham);
+
+                var checkinTime = checkin.HasValue ? checkin.Value.TimeOfDay : TimeSpan.Zero;
+                var checkoutTime = checkout.HasValue ? checkout.Value.TimeOfDay : TimeSpan.Zero;
+
+                bool hasCheckIn = group.Any(x => x.GioCham.HasValue && x.GioCham.Value.TimeOfDay <= new TimeSpan(12, 0, 0));
+                bool hasCheckOut = group.Any(x => x.GioCham.HasValue && x.GioCham.Value.TimeOfDay >= new TimeSpan(12, 0, 0));
+
+                var phep = nghiPhepList.FirstOrDefault(x =>
+                    x.MANS == maNV &&
+                    x.NGAY == DateOnly.FromDateTime(ngayCham)
+                );
+
+                string sangPhep = phep?.SANG ?? ".";
+                string chieuPhep = phep?.CHIEU ?? ".";
+
+                int loaiViPham = 0;
+
+                if (!hasCheckIn && !hasCheckOut)
+                {
+                    loaiViPham = 10; // Không có cả check-in lẫn check-out
+                }
+                else if (!hasCheckIn || !hasCheckOut)
+                {
+                    loaiViPham = 9; // Thiếu 1 trong 2
+                }
+                else
+                {
+                    bool muon = (checkinTime - new TimeSpan(8, 0, 0)).TotalMinutes > 10 && sangPhep == ".";
+                    bool som = (new TimeSpan(17, 30, 0) - checkoutTime).TotalMinutes > 10 && chieuPhep == ".";
+
+                    if (muon && som &&
+                        (checkinTime - new TimeSpan(8, 0, 0)).TotalMinutes >= 120 &&
+                        (new TimeSpan(17, 30, 0) - checkoutTime).TotalMinutes >= 120)
+                    {
+                        loaiViPham = 7; // Đi trễ và về sớm nghiêm trọng
+                    }
+                    else if (muon)
+                    {
+                        loaiViPham = 1; // Đi trễ
+                    }
+                    else if (som)
+                    {
+                        loaiViPham = 2; // Về sớm
+                    }
+                }
+
+                if (loaiViPham == 0)
+                {
+                    string viPhamId = $"{maNV}{ngayCham:ddMMyyyy}";
+
+                    _logger.LogInformation($"Insert vpcc_temp: maNV = {maNV}, ngay = {ngayCham}, viphamid = {viPhamId}, loai = {loaiViPham}");
+
+                    await _unitOfWork.VPCCTempRepo.AddAsync(new tb_vpcc_temp
+                    {
+                        maky = maky,
+                        viphamid = viPhamId,
+                        mans = maNV.ToString(),
+                        ngay = DateOnly.FromDateTime(ngayCham),
+                        loaiviphamid = loaiViPham,
+                        //time_in = hasCheckIn.ToString(),
+                        //time_out = hasCheckOut.ToString(),
+                        //madv = maNV,
+                        //hoten="1",
+                        //chucdanh ="s"
+                    });
+                    
+                }
+            }
+            await _unitOfWork.SaveChangesAsync();
+
+        }
+
+        public async System.Threading.Tasks.Task CheckViPhamAsync1(DateTime fromDate, DateTime toDate, int maky)
+        {
+            try
+            {
+
+
+                var dataInMonth = await _unitOfWork.ChamCong_CheckInOut_v1Repo
+                    .GetByConditionAsync(x => x.NgayCham >= fromDate && x.NgayCham <= toDate);
+
+                var fromDateOnly = DateOnly.FromDateTime(fromDate);
+                var toDateOnly = DateOnly.FromDateTime(toDate);
+
+                var nghiPhepList = await _unitOfWork.NghiPhepRepo
+                    .GetByConditionAsync(x => x.NGAY >= fromDateOnly && x.NGAY <= toDateOnly);
+
+                var groupData = dataInMonth
+                    .GroupBy(x => new { x.MaNhanVien, Ngay = x.NgayCham.Value.Date });
+
+                _logger.LogInformation($"Số bản ghi chấm công trong kỳ: {dataInMonth.Count()}");
+                _logger.LogInformation($"Tổng số group NV/ngày: {groupData.Count()}");
+
+                foreach (var group in groupData)
+                {
+                    var maNV = group.Key.MaNhanVien;
+                    var ngayCham = group.Key.Ngay;
+                    var checkin = group.Min(x => x.GioCham);
+                    var checkout = group.Max(x => x.GioCham);
+
+                    var checkinTime = checkin.HasValue ? checkin.Value.TimeOfDay : TimeSpan.Zero;
+                    var checkoutTime = checkout.HasValue ? checkout.Value.TimeOfDay : TimeSpan.Zero;
+
+                    bool hasCheckIn = group.Any(x => x.GioCham.HasValue && x.GioCham.Value.TimeOfDay <= new TimeSpan(12, 0, 0));
+                    bool hasCheckOut = group.Any(x => x.GioCham.HasValue && x.GioCham.Value.TimeOfDay >= new TimeSpan(12, 0, 0));
+
+                    var phep = nghiPhepList.FirstOrDefault(x =>
+                        x.MANS == maNV &&
+                        x.NGAY == DateOnly.FromDateTime(ngayCham)
+                    );
+
+                    string sangPhep = phep?.SANG ?? ".";
+                    string chieuPhep = phep?.CHIEU ?? ".";
+
+                    int loaiViPham = 0;
+
+                    if (!hasCheckIn && !hasCheckOut)
+                    {
+                        loaiViPham = 10;
+                    }
+                    else if (!hasCheckIn || !hasCheckOut)
+                    {
+                        loaiViPham = 9;
+                    }
+                    else
+                    {
+                        bool muon = (checkinTime - new TimeSpan(8, 0, 0)).TotalMinutes >= 10 && sangPhep == ".";
+                        bool som = (new TimeSpan(17, 30, 0) - checkoutTime).TotalMinutes >= 10 && chieuPhep == ".";
+
+                        if (muon && som)
+                        {
+                            loaiViPham = 7;
+                        }
+                        else if (muon)
+                        {
+                            loaiViPham = 1;
+                        }
+                        else if (som)
+                        {
+                            loaiViPham = 2;
+                        }
+                    }
+
+                    string viPhamId = $"{maNV}{ngayCham:ddMMyyyy}";
+
+                    try
+                    {
+                        var isExist = await _unitOfWork.VPCCTempRepo
+                            .GetByConditionAsync(x => x.viphamid == viPhamId);
+
+                        if (!isExist.Any())
+                        {
+                            _logger.LogInformation($"Insert vpcc_temp: maNV = {maNV}, ngay = {ngayCham:yyyy-MM-dd}, viphamid = {viPhamId}, loai = {loaiViPham}");
+
+                            await _unitOfWork.VPCCTempRepo.AddAsync(new tb_vpcc_temp
+                            {
+                                maky = maky,
+                                viphamid = viPhamId,
+                                mans = maNV.ToString(),
+                                ngay = DateOnly.FromDateTime(ngayCham),
+                                loaiviphamid = loaiViPham,
+                                time_in = hasCheckIn.ToString(),
+                                time_out = hasCheckOut.ToString(),
+                                madv = maNV,
+                                hoten = "1",
+                                chucdanh = "s"
+                            });
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Đã tồn tại viphamid = {viPhamId}, bỏ qua insert.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Lỗi khi insert vpcc_temp: maNV = {maNV}, viphamid = {viPhamId}, ngày = {ngayCham:yyyy-MM-dd}");
+                        throw;
+                    }
+                }
+
+                try
+                {
+                    await _unitOfWork.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi khi SaveChangesAsync sau khi insert các vi phạm");
+                    throw;
+                }
+            }
+            catch (Exception ex){
+                _logger.LogError(ex, "Lỗi");
+                throw;
+            }
+        }
+
+
     }
 }

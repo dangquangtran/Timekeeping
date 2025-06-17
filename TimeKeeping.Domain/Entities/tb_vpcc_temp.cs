@@ -5,7 +5,7 @@ namespace TimeKeeping.Domain.Entities;
 
 public partial class tb_vpcc_temp
 {
-    public string? viphamid { get; set; }
+    public string viphamid { get; set; } = null!;
 
     public int? maky { get; set; }
 
