@@ -64,7 +64,9 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                         GioCham = formattedGioCham,
                         TenMay = c.TenMay,
                     };
-                }).ToList();
+                }).OrderBy(vm => vm.HoTen)
+        .ThenByDescending(vm => DateTime.ParseExact(vm.NgayCham, "dd/MM/yyyy", null))
+        .ToList();
 
                 return result;
             }

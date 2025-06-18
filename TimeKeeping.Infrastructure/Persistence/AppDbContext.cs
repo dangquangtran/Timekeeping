@@ -42,6 +42,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<tb_GroupFunctionDetail> tb_GroupFunctionDetails { get; set; }
     public virtual DbSet<tb_Account> tb_Accounts { get; set; }
 
+    public virtual DbSet<tb_lich_lam_viec> tb_lich_lam_viecs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChamCong_CheckInOut_temp>(entity =>
@@ -351,6 +352,24 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.viphamid)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<tb_lich_lam_viec>(entity =>
+        {
+            entity.ToTable("tb_lich_lam_viec");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Ngay)
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(e => e.LaNgayLamViec)
+                .IsRequired();
+
+            entity.Property(e => e.LoaiNgay)
+                .HasMaxLength(50)
+                .IsUnicode();
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -69,6 +69,9 @@ namespace TimeKeeping.Infrastructure
         private IGenericRepository<tb_Account> accountRepo;
         public IGenericRepository<tb_Account> AccountRepo => accountRepo ??= new GenericRepository<tb_Account>(_context);
 
+        private IGenericRepository<tb_lich_lam_viec> lichlamviecRepo;
+        public IGenericRepository<tb_lich_lam_viec> LichLamViecRepo => lichlamviecRepo ??= new GenericRepository<tb_lich_lam_viec>(_context);
+
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
         public async Task BeginTransactionAsync()
