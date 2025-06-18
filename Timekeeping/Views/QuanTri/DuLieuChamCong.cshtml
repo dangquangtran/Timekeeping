@@ -1,18 +1,67 @@
-﻿@model IEnumerable<TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel.ChamCongCheckInOutV1GetViewModel>
-
+﻿@model TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel.ChamCongCheckInOutV1PageViewModel
 @{
-    var stt = 1;
+    var stt = 1 + (Model.PageIndex - 1) * Model.PageSize;
 }
 
 <div class="container">
     <p class="border-bottom mb-5">Quản trị/Dữ liệu chấm công</p>
     <h5 class="text-center" style="color: #ef4e24"><strong>DỮ LIỆU CHẤM CÔNG</strong></h5>
+    
+    <!-- FILTER AND PAGINATION CONTROLS -->
+    <div class="d-flex justify-content-between mb-2">
+        <form method="get" asp-action="DuLieuChamCong" class="row align-items-center">
+            <div class="col-auto d-flex align-items-center">
+                <span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
+                <label class="me-2 mb-0">Kỳ</label>
+                <select name="ky" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Chọn kỳ</option>
+                    @if (ViewBag.DanhSachKy != null)
+                    {
+                        foreach (var ky in ViewBag.DanhSachKy)
+                        {
+                            <option value="@ky.ky" selected="@(ViewBag.SelectedKy == ky.ky)">@ky.ky</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <label class="me-2 mb-0">Đơn vị</label>
+                <select name="donVi" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Chọn đơn vị</option>
+                    @if (ViewBag.DanhSachDonVi != null)
+                    {
+                        foreach (var dv in ViewBag.DanhSachDonVi)
+                        {
+                            <option value="@dv.DonVi" selected="@(ViewBag.SelectedDonVi == dv.DonVi)">@dv.DonVi</option>
+                        }
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="pageIndex" value="1" />
+        </form>
+ 
+        <form method="get" asp-action="DuLieuChamCong" class="d-flex align-items-center">
+            <p class="mb-0 me-2">Chọn số dòng</p>
+            <select name="pageSize" class="form-select w-auto" onchange="this.form.submit()">
+                @foreach (var size in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@size" selected="@(Model.PageSize == size)">@size</option>
+                }
+            </select>
+            <input type="hidden" name="pageIndex" value="1" />
+            <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="donVi" value="@ViewBag.SelectedDonVi" />
+        </form>
+    </div>
+
+    <!-- DATA TABLE -->
     <table class="table table-bordered table-hover" style="border-color:#00bfff">
         <thead class="text-center" style="background-color: lightgray">
             <tr>
                 <th>STT</th>
-                <th>Tên kỳ</th>
-                <th>Thời gian</th>
+                <th>Mã chấm công</th>
+                <th>Họ tên</th>
                 <th>Chức danh</th>
                 <th>Đơn vị</th>
                 <th>Ngày chấm</th>
@@ -21,9 +70,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model != null && Model.Any())
+            @if (Model.List?.Any() == true)
             {
-                foreach (var item in Model)
+                foreach (var item in Model.List)
                 {
                     <tr>
                         <td>@stt</td>
@@ -41,10 +90,34 @@
             else
             {
                 <tr>
-                    <td colspan="5" class="text-center text-danger">Không có dữ liệu</td>
+                    <td colspan="8" class="text-center text-danger">Không có dữ liệu</td>
                 </tr>
             }
         </tbody>
     </table>
-    <button class="mt-2">Export Excel</button>
+
+    <!-- EXPORT AND PAGINATION -->
+    <div class="d-flex justify-content-between">
+        <form method="post" asp-action="ExportExcelDSChamCong" asp-controller="ChamCongCheckInOutV1" target="_blank" class="mb-0">
+            <input type="hidden" name="Ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="TenDonVi" value="@ViewBag.SelectedDonVi" />
+            <button type="submit" class="btn btn-success">Export Excel</button>
+        </form>
+
+        <form method="get" asp-action="DuLieuChamCong" class="custom-pagination">
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="donVi" value="@ViewBag.SelectedDonVi" />
+            
+            <button class="custom-page-btn" name="pageIndex" value="1" 
+                    disabled="@(Model.PageIndex == 1)" title="Trang đầu">&laquo;|</button>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)" 
+                    disabled="@(Model.PageIndex == 1)" title="Trang trước">&lsaquo;</button>
+            <span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)" 
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang sau">&rsaquo;</button>
+            <button class="custom-page-btn" name="pageIndex" value="@Model.TotalPages" 
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang cuối">|&raquo;</button>
+        </form>
+    </div>
 </div>

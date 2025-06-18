@@ -11,7 +11,7 @@
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="mb-2">
                     <label class="form-label">Tên kỳ</label>
-                    <input asp-for="CreateModel.tenky" class="form-control" required />
+                    <input asp-for="CreateModel.tenky" class="form-control" />
                     <span asp-validation-for="CreateModel.tenky" class="text-danger"></span>
                 </div>
                 <div class="mb-2">
@@ -43,19 +43,19 @@
             </form>
         </div>
         <div class="col-md-8">
-            <h5 style="color: #00bfff"><strong>Thêm kỳ báo cáo</strong></h5>
-            <div class="d-flex justify-content-end align-items-center">
-                <p>Chọn số dòng</p>
-                <form method="get" asp-action="KyBaoCao" class="d-flex justify-content-end align-items-center mb-2" style="gap:8px">
-    <select name="pageSize" class="form-select w-auto ms-2" onchange="this.form.submit()">
-                        <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
-                        <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
-                        <option value="50" selected="@(Model.PageSize == 50 ? "selected" : null)">50</option>
-                        <option value="100" selected="@(Model.PageSize == 100 ? "selected" : null)">100</option>
+            <h5 style="color: #00bfff"><strong>Danh sách kỳ báo cáo</strong></h5>
+            <div class="d-flex justify-content-end align-items-center mb-2">
+                <p class="mb-0">Chọn số dòng</p>
+                <form method="get" asp-action="KyBaoCao" class="d-flex justify-content-end align-items-center" style="gap:8px">
+                    <select name="pageSize" class="form-select w-auto ms-2" onchange="this.form.submit()">
+                                        <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
+                                        <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
+                                        <option value="50" selected="@(Model.PageSize == 50 ? "selected" : null)">50</option>
+                                        <option value="100" selected="@(Model.PageSize == 100 ? "selected" : null)">100</option>
 
-    </select>
-    <input type="hidden" name="pageIndex" value="1" />
-</form>
+                    </select>
+                    <input type="hidden" name="pageIndex" value="1" />
+                </form>
 
             </div>
             <table class="table table-bordered table-hover" style="border-color:#00bfff">

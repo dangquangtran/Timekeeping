@@ -17,11 +17,33 @@ namespace Timekeeping.Controllers
             _chamCongCheckInOutV1Service = chamCongCheckInOutV1Service;
         }
         [Route("QuanTri/DuLieuChamCong")]
-        public async Task<IActionResult> DuLieuChamCong(int pageIndex = 1, int pageSize = 20)
+        public async Task<IActionResult> DuLieuChamCong(int pageIndex = 1, int pageSize = 20, string? donVi = null, string? ky = null)
         {
-            var data = await _chamCongCheckInOutV1Service.GetAllAsync(pageIndex, pageSize);
-            return View("~/Views/QuanTri/DuLieuChamCong.cshtml", data);
+            var filter = new FilterChamCongViewModel
+            {
+                DonVi = donVi,
+                Ky = ky
+            };
+            
+            var (list, totalPages) = await _chamCongCheckInOutV1Service.GetFilteredAsync(pageIndex, pageSize, filter);
+            var vm = new ChamCongCheckInOutV1PageViewModel
+            {
+                List = list,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
+            
+            // Truyền filter values vào ViewBag để giữ lại giá trị đã chọn
+            ViewBag.SelectedDonVi = donVi;
+            ViewBag.SelectedKy = ky;
+            // Lấy danh sách kỳ và đơn vị cho dropdown
+            ViewBag.DanhSachKy = await _chamCongCheckInOutV1Service.GetAllKyAsync();
+            ViewBag.DanhSachDonVi = await _chamCongCheckInOutV1Service.GetAllDonViAsync();
+            
+            return View("~/Views/QuanTri/DuLieuChamCong.cshtml", vm);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetDanhSachChamCong([FromQuery] int pageIndex, [FromQuery] int pageSize)
@@ -32,10 +54,9 @@ namespace Timekeeping.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> ExportExcelDSChamCong([FromBody] ChamCongExportRequestViewModel chamCongExportRequestViewModel)
+        public async Task<IActionResult> ExportExcelDSChamCong([FromForm] ChamCongExportRequestViewModel chamCongExportRequestViewModel)
         {
             var result = await _chamCongCheckInOutV1Service.ExportChamCongToExcelAsync(chamCongExportRequestViewModel);
-            //return Ok(result);
             if (result == null || result.Length == 0)
             {
                 return BadRequest("Không có dữ liệu chấm công phù hợp với yêu cầu.");
@@ -45,11 +66,12 @@ namespace Timekeeping.Controllers
                 return BadRequest("Kỳ không hợp lệ. Định dạng đúng là 'Tháng 6/2025'.");
             }
             return File(
-        result,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        $"ChamCong_{thang}_{nam}.xlsx"
-    );
+                result,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ChamCong_{thang}_{nam}.xlsx"
+            );
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetDanhSachKy()
