@@ -86,7 +86,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var maNhanVien = account.MaNhanVien;
 
                 var allData = await _unitOfWork.VPCCTempRepo
-                    .GetByConditionAsync(x => x.madv == maNhanVien);
+                    .GetByConditionAsync(x => x.madv == maNhanVien && x.loaiviphamid !=0);
 
                 var totalCount = allData.Count();
 
