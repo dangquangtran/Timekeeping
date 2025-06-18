@@ -28,7 +28,8 @@ namespace TimeKeeping.Infrastructure
             services.AddScoped<IChamCongCheckInOutV1Service, ChamCongCheckInOutV1Service>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IBaoCaokiService, BaoCaokiService>();
-           
+            services.AddScoped<IGiaiTrinhService, GiaiTrinhService>();
+
             var jwtSecretKey = configuration["Jwt:SecretKey"];
 
             // Đăng ký AccountService và truyền jwtSecretKey vào constructor
