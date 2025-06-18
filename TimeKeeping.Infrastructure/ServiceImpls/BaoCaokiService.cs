@@ -371,7 +371,15 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                             if (sangPhep == "." || chieuPhep == ".")
                                 loaiViPham = 10;
                         }
-                        else if (!hasCheckIn || !hasCheckOut)
+                        //else if (!hasCheckIn || !hasCheckOut)
+                        //{
+                        //    loaiViPham = 9;
+                        //}
+                        else if (!hasCheckIn && sangPhep == ".")
+                        {
+                            loaiViPham = 9;
+                        }
+                        else if (!hasCheckOut && chieuPhep == ".")
                         {
                             loaiViPham = 9;
                         }
