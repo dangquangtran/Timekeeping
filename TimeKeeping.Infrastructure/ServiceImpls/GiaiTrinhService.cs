@@ -11,6 +11,7 @@ using TimeKeeping.Application.Interfaces;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
+using TimeKeeping.Application.ViewModels.LyDoViPhamViewModel;
 using TimeKeeping.Domain.Entities;
 
 namespace TimeKeeping.Infrastructure.ServiceImpls
@@ -135,7 +136,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var maNhanVien = account.MaNhanVien;
 
                 // 1. Lấy tất cả bản ghi vi phạm theo nhân viên
-                var allData = await _unitOfWork.VPCCTempRepo
+                var allData = await _unitOfWork.ViPhamChamCongVanTayRepo
                     .GetByConditionAsync(x => x.madv == maNhanVien && x.loaiviphamid != 0);
 
                 var totalCount = allData.Count();
@@ -257,6 +258,26 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             }
         }
 
+        public async Task<IEnumerable<LyDoViPhamGiaiTrinhGetViewModel>> GetListLidoAsync()
+        {
+            try
+            {
+                var getListLido = await _unitOfWork.LyDoViPhamRepo.GetAllAsync();
+                var result = getListLido.Select(x => new LyDoViPhamGiaiTrinhGetViewModel
+                {
+                    lydoid = x.lydoid,
+                    tenlydo = x.tenlydo,
+                    kemfile = x.kemfile
+                });
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                _logger.LogError(ex, "Lỗi khi lấy danh sách chấm công có filter");
+                return (Enumerable.Empty<LyDoViPhamGiaiTrinhGetViewModel>());
+            }
+        }
 
     }
 }

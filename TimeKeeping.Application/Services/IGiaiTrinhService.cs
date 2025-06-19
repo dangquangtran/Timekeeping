@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
+using TimeKeeping.Application.ViewModels.LyDoViPhamViewModel;
 
 namespace TimeKeeping.Application.Services
 {
@@ -13,5 +14,6 @@ namespace TimeKeeping.Application.Services
         Task<(IEnumerable<GiaiTrinhBaoCaoGetViewModel> List, int TotalPages)> GetListChamCongAsync(int pageIndex, int pageSize, string userName);
         Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName);
         Task<IEnumerable<GiaiTrinhChamCongViewModel>> SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel);
+        Task<IEnumerable<LyDoViPhamGiaiTrinhGetViewModel>> GetListLidoAsync();
     }
 }

@@ -47,5 +47,12 @@ namespace Timekeeping.Controllers
             var result = await _giaiTrinhService.SaveGiaiTrinhAsync(giaiTrinhChamCongViewModel);
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDanhSachLyDo()
+        {
+            var result = await _giaiTrinhService.GetListLidoAsync();
+            return Ok(result);
+        }
     }
 }

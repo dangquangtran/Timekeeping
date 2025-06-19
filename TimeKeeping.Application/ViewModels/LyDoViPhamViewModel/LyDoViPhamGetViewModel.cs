@@ -18,4 +18,11 @@ namespace TimeKeeping.Application.ViewModels.LyDoViPhamViewModel
 
         public int kemfile { get; set; }
     }
+    public class LyDoViPhamGiaiTrinhGetViewModel
+    {
+        public int lydoid { get; set; }
+
+        public string tenlydo { get; set; } = null!;
+        public int kemfile { get; set; }
+    }
 }
