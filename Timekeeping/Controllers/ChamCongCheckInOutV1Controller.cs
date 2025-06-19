@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TimeKeeping.Application.Helpers;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
@@ -6,6 +7,7 @@ using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
 {
+    [Authorize]
     public class ChamCongCheckInOutV1Controller : Controller
     {
         private readonly ILogger<ChamCongCheckInOutV1Controller> _logger;
