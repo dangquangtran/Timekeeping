@@ -5,6 +5,7 @@ namespace TimeKeeping.Domain.Entities;
 
 public partial class tb_giaitrinh_chamcong
 {
+    public int Id { get; set; }
     public string? viphamid { get; set; }
 
     public int? giaitrinhid { get; set; }

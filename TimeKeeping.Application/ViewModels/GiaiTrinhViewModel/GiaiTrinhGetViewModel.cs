@@ -12,7 +12,13 @@ namespace TimeKeeping.Application.ViewModels.GiaiTrinhViewModel
         public string Ngay { get; set;}
         public string GioVao { get; set;}
         public string GioRa { get; set;}
-        public string GiaiTrinh { get; set;}
-        public string File { get; set;}
+        public int? GiaiTrinh { get; set;}
+        public int? File { get; set;}
+
+        public string? viphamid { get; set; }
+
+       // public int? giaitrinhid { get; set; }
+
+        public int? maky { get; set; }
     }
 }

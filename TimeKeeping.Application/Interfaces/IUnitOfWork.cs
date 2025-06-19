@@ -31,6 +31,8 @@ namespace TimeKeeping.Application.Interfaces
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
+
+        Task ExecuteInsertViPhamChamCongAsync(int maky);
     }
 
 }

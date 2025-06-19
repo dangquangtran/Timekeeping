@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,6 +106,14 @@ namespace TimeKeeping.Infrastructure
         {
             _transaction?.Dispose();
             _context.Dispose();
+        }
+
+        public async Task ExecuteInsertViPhamChamCongAsync(int maky)
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC sp_Insert_ViPhamChamCong @maky",
+                new SqlParameter("@maky", maky)
+            );
         }
     }
 

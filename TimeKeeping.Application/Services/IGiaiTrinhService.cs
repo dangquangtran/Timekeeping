@@ -12,5 +12,6 @@ namespace TimeKeeping.Application.Services
     {
         Task<(IEnumerable<GiaiTrinhBaoCaoGetViewModel> List, int TotalPages)> GetListChamCongAsync(int pageIndex, int pageSize, string userName);
         Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName);
+        Task<IEnumerable<GiaiTrinhChamCongViewModel>> SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel);
     }
 }

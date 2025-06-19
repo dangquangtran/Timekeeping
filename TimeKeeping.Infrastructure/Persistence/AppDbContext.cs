@@ -196,8 +196,12 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<tb_giaitrinh_chamcong>(entity =>
         {
             entity
-                .HasNoKey()
+             //   .HasNoKey()
                 .ToTable("tb_giaitrinh_chamcong");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e=>e.Id)
+                  .ValueGeneratedOnAdd();
 
             entity.Property(e => e.viphamid)
                 .HasMaxLength(50)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
+using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
 using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
@@ -38,6 +39,13 @@ namespace Timekeeping.Controllers
             var (list, totalPages) = result;
 
             return Ok(new { List = list, TotalPages = totalPages });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateGiaiTrinh([FromBody] GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel)
+        {
+            var result = await _giaiTrinhService.SaveGiaiTrinhAsync(giaiTrinhChamCongViewModel);
+            return Ok(result);
         }
     }
 }

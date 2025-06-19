@@ -426,6 +426,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                                     hoten = nv.FullName ?? "",
                                     chucdanh = nv.ChucVu ?? ""
                                 });
+                                
                             }
                         }
                         catch (Exception ex)
@@ -439,6 +440,8 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 try
                 {
                     await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.ExecuteInsertViPhamChamCongAsync(maky);
+                    //await _unitOfWork.CommitTransactionAsync();
                 }
                 catch (Exception ex)
                 {
