@@ -10,7 +10,8 @@ namespace TimeKeeping.Application.Services
 {
     public interface IPermissionService
     {
-        Task<IEnumerable<AccountGetViewModel>> GetAllAsync(int pageIndex, int pageSize);
+        Task<(IEnumerable<AccountGetViewModel> accounts, int totalCount)> GetAllAsync(int pageIndex, int pageSize, string msnv = "");
+        Task<IEnumerable<AccountGetViewModel>> GetAllAccountsForDropdownAsync();
         Task<IEnumerable<PermissionGetViewModel>> GetAllPermissionAsync();
         Task<IEnumerable<PermissionUpdateViewModel>> UpdatePermissionAsync(PermissionUpdateViewModel permissionUpdateViewModel);
     }

@@ -1,0 +1,83 @@
+﻿@model LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Đăng nhập - Kienlongbank</title>
+    <link rel="icon" type="image/png" href="~/images/logo-kienlongbank-favicon.png" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="login-container">
+            <div class="card shadow-lg p-5" style="min-width:380px;max-width:420px;width:100%;">
+                <div class="logo-container">
+                    <img src="~/images/logo.png" alt="Kienlongbank Logo" />
+                    <h4 class="text-primary mb-0">Hệ thống chấm công</h4>
+                </div>
+                
+                <form asp-action="Login" method="post" id="loginForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    <div class="floating-label">
+                        <div class="input-group">
+                            <i class="fas fa-user input-icon"></i>
+                            <input asp-for="UserName" class="form-control with-icon" placeholder=" " required />
+                            <label asp-for="UserName">Tên đăng nhập</label>
+                        </div>
+                        <span asp-validation-for="UserName" class="text-danger validation-error"></span>
+                    </div>
+                    
+                    <div class="floating-label">
+                        <div class="input-group">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input asp-for="Password" type="password" class="form-control with-icon" id="passwordInput" placeholder=" " required />
+                            <label asp-for="Password">Mật khẩu</label>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger validation-error"></span>
+                    </div>
+                    
+
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+                        <span id="btnText">ĐĂNG NHẬP</span>
+                        <span id="btnLoading" style="display:none;">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Đang xử lý...
+                        </span>
+                    </button>
+                    
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            Cần hỗ trợ? Liên hệ IT: <strong>1900 6929</strong>
+                        </small>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="text-center mt-3">
+                <small class="text-white">
+                    © 2024 Ngân hàng Kiên Long. All rights reserved.
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/js/login.js" asp-append-version="true"></script>
+</body>
+</html>

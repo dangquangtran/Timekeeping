@@ -1,0 +1,20 @@
+@model TimeKeeping.Application.ViewModels.AccountViewModel.LoginViewModel
+
+@{
+    ViewData["Title"] = "??ng nh?p";
+}
+
+<h2>??ng nh?p</h2>
+<form asp-action="Index" method="post">
+    <div class="form-group">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">??ng nh?p</button>
+</form>

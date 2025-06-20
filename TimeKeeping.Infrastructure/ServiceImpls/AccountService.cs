@@ -67,6 +67,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 new Claim("UserID", account.ID.ToString()),
                 new Claim("UserName", account.UserName),
                 new Claim("FullName", account.FullName),
+                new Claim(ClaimTypes.Name, account.FullName), // Thêm dòng này
                 new Claim(ClaimTypes.Role, account.GroupFuncID.ToString()) 
             };
 

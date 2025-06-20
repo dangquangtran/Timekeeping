@@ -12,11 +12,12 @@
         </nav>
         <div class="profile d-flex align-items-center col-md-4 justify-content-center">
             <div>
-                <a href="/logout" class="text-white text-decoration-none">
-                    <i class="fa-solid fa-circle-user pe-1"></i>Đào Anh Dũng</a>
+                <a href="#" class="text-white text-decoration-none">
+                    <i class="fa-solid fa-circle-user pe-1"></i>@User.Identity?.Name
+                </a>
             </div>
             <div class="ms-3">
-                <a href="/logout" class="text-white">
+                <a href="/Login/Logout" class="text-white">
                     <i class="fa-solid fa-right-from-bracket pe-1"></i>Đăng xuất
                 </a>
             </div>
@@ -47,7 +48,7 @@
 				<a href="#" class="dropdown-link me-3">Vi phạm ngày công</a>
             </div>
             <div id="admin-dropdown" class="dropdown-content d-none">
-                <a href="#" class="dropdown-link me-3">Phân quyền</a>
+                <a href="/QuanTri/PhanQuyen" class="dropdown-link me-3">Phân quyền</a>
                 <a href="/QuanTri/DulieuChamCong" class="dropdown-link me-3">Dữ liệu chấm công</a>
             </div>
         </div>
