@@ -1,0 +1,168 @@
+﻿@model PermissionPageViewModel
+
+<link rel="stylesheet" href="~/css/phan-quyen.css" asp-append-version="true" />
+<div class="container">
+	<p class="border-bottom mb-5">Quản trị/Phân quyền</p>
+	<h5 class="text-center" style="color: #ef4e24"><strong>PHÂN QUYỀN</strong></h5>
+
+
+
+	<div class="row">
+		<div class="col-md-4">
+			<form asp-controller="Permission" asp-action="ThemQuyen" method="post" class="text-start border p-3 rounded bg-light form-create">
+				@if (TempData["SuccessMessage"] != null)
+				{
+					<div class="alert alert-success alert-dismissible fade show" role="alert">
+						@TempData["SuccessMessage"]
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				}
+
+				@if (TempData["ErrorMessage"] != null)
+				{
+					<div class="alert alert-danger alert-dismissible fade show" role="alert">
+						@TempData["ErrorMessage"]
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				}
+				<h5 style="color: #00bfff"><strong>Thêm quyền</strong></h5>
+				@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+				<div class="mb-2">
+					<label class="form-label">Mã nhân sự</label>
+					<select asp-for="PermissionUpdate.MaNhanVien" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
+						<option value="">Chọn mã nhân sự</option>
+						@if (Model.AllAccounts != null)
+						{
+							foreach (var acc in Model.AllAccounts)
+							{
+								<option value="@acc.MaNhanVien">@acc.MaNhanVien - @acc.HoTen</option>
+							}
+						}
+					</select>
+					<span asp-validation-for="PermissionUpdate.MaNhanVien" class="text-danger"></span>
+				</div>
+				<div class="mb-2">
+					<label class="form-label" style="color: #666;">Thuộc nhóm ND</label>
+					<select asp-for="PermissionUpdate.ThuocNhomND" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
+						<option value="">Chọn nhóm ND</option>
+						@if (Model.Permissions != null)
+						{
+							foreach (var p in Model.Permissions)
+							{
+								<option value="@p.ThuocNhomND">@p.ThuocNhomND</option>
+							}
+						}
+					</select>
+					<span asp-validation-for="PermissionUpdate.ThuocNhomND" class="text-danger"></span>
+				</div>
+				<div class="btn-group">
+					<button type="submit" class="btn btn-primary w-100">XÁC NHẬN</button>
+					<button type="reset" class="btn-reset">LÀM MỚI</button>
+				</div>
+				<input type="hidden" asp-for="PageIndex" />
+				<input type="hidden" asp-for="PageSize" />
+			</form>
+		</div>
+		<div class="col-md-8">
+			<!-- FILTER AND PAGINATION CONTROLS -->
+			<div class="d-flex justify-content-between mb-2">
+				<form method="get" asp-action="PhanQuyen" class="row align-items-center">
+					<div class="col-auto d-flex align-items-center">
+						<span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
+						<label class="me-2 mb-0">Nhân viên</label>
+						<select name="msnv" class="form-select w-auto" onchange="this.form.submit()">
+							<option value="">Tất cả</option>
+							@if (Model.AllAccounts != null)
+							{
+								foreach (var acc in Model.AllAccounts)
+								{
+									<option value="@acc.MaNhanVien" selected="@(ViewBag.MSNV?.ToString() == acc.MaNhanVien)">@acc.MaNhanVien - @acc.HoTen</option>
+								}
+							}
+						</select>
+					</div>
+					<input type="hidden" name="pageSize" value="@Model.PageSize" />
+					<input type="hidden" name="pageIndex" value="1" />
+				</form>
+
+				<form method="get" asp-action="PhanQuyen" class="d-flex align-items-center">
+					<p class="mb-0 me-2">Chọn số dòng</p>
+					<select name="pageSize" class="form-select w-auto" onchange="this.form.submit()">
+						@foreach (var size in new[] { 10, 20, 50, 100 })
+						{
+							<option value="@size" selected="@(Model.PageSize == size)">@size</option>
+						}
+					</select>
+					<input type="hidden" name="pageIndex" value="1" />
+					<input type="hidden" name="msnv" value="@(ViewBag.MSNV ?? "")" />
+				</form>
+			</div>
+
+			<!-- DATA TABLE -->
+			<table class="table table-bordered table-hover" style="border-color:#00bfff">
+				<thead class="text-center" style="background-color: lightgray">
+					<tr>
+						<td>MSNV</td>
+						<td>User Portal</td>
+						<td>Tên nhân viên</td>
+						<td>Đơn vị</td>
+						<td>Chức danh</td>
+						<td>Thuộc nhóm ND</td>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model.Accounts != null && Model.Accounts.Any())
+					{
+						foreach (var item in Model.Accounts)
+						{
+							<tr>
+								<td>@item.MaNhanVien</td>
+								<td>@item.UserPortal</td>
+								<td>@item.HoTen</td>
+								<td>@item.DonVi</td>
+								<td>@item.ChucDanh</td>
+								<td>@item.ThuocNhomND</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<td colspan="6" class="text-center text-danger">Không có dữ liệu</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+			<!-- PAGINATION -->
+			<div class="d-flex justify-content-end align-items-center">
+				<form method="get" asp-action="PhanQuyen" class="custom-pagination">
+					<input type="hidden" name="pageSize" value="@Model.PageSize" />
+					<input type="hidden" name="msnv" value="@(ViewBag.MSNV ?? "")" />
+
+					<button type="submit" class="custom-page-btn" name="pageIndex" value="1"
+							disabled="@(Model.PageIndex == 1)" title="Trang đầu">
+						&laquo;|
+					</button>
+					<button type="submit" class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)"
+							disabled="@(Model.PageIndex == 1)" title="Trang trước">
+						&lsaquo;
+					</button>
+					<span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+					<button type="submit" class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)"
+							disabled="@(Model.PageIndex >= Model.TotalPages)" title="Trang sau">
+						&rsaquo;
+					</button>
+					<button type="submit" class="custom-page-btn" name="pageIndex" value="@Model.TotalPages"
+							disabled="@(Model.PageIndex >= Model.TotalPages)" title="Trang cuối">
+						|&raquo;
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -90,29 +90,7 @@ body {
     margin-right: 8px;
 }
 
-.remember-forgot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    font-size: 14px;
-}
 
-.form-check-input:checked {
-    background-color: #1e3c72;
-    border-color: #1e3c72;
-}
-
-.forgot-link {
-    color: #1e3c72;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.forgot-link:hover {
-    color: #2a5298;
-    text-decoration: underline;
-}
 
 .error-shake {
     animation: shake 0.5s ease-in-out;

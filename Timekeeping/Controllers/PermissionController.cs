@@ -18,16 +18,61 @@ namespace Timekeeping.Controllers
             _logger = logger;
             _permissionService = permissionService;
         }
-        public IActionResult Index()
+        [Route("QuanTri/PhanQuyen")]
+        public async Task<IActionResult> PhanQuyen(int pageIndex = 1, int pageSize = 10, string msnv = "")
         {
-            return View();
+            var (accounts, totalCount) = await _permissionService.GetAllAsync(pageIndex, pageSize, msnv);
+            var allAccounts = await _permissionService.GetAllAccountsForDropdownAsync();
+            var permissions = await _permissionService.GetAllPermissionAsync();
+
+            var model = new PermissionPageViewModel
+            {
+                Accounts = accounts,
+                AllAccounts = allAccounts,
+                Permissions = permissions,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
+            
+            ViewBag.MSNV = msnv;
+            
+            return View("~/Views/QuanTri/PhanQuyen.cshtml", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThemQuyen(PermissionPageViewModel model)
+        {
+            ModelState.Remove("Accounts");
+            ModelState.Remove("AllAccounts");
+            ModelState.Remove("Permissions");
+            if (!ModelState.IsValid)
+            {
+                model.AllAccounts = await _permissionService.GetAllAccountsForDropdownAsync();
+                model.Permissions = await _permissionService.GetAllPermissionAsync();
+                return View("~/Views/QuanTri/PhanQuyen.cshtml", model);
+            }
+
+            try
+            {
+                var result = await _permissionService.UpdatePermissionAsync(model.PermissionUpdate);
+                TempData["SuccessMessage"] = result.Any() ? "Cập nhật quyền thành công!" : "Có lỗi xảy ra khi cập nhật quyền!";
+                return RedirectToAction("PhanQuyen", new { pageIndex = model.PageIndex, pageSize = model.PageSize });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                model.AllAccounts = await _permissionService.GetAllAccountsForDropdownAsync();
+                model.Permissions = await _permissionService.GetAllPermissionAsync();
+                return View("~/Views/QuanTri/PhanQuyen.cshtml", model);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDanhSachAccount([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
-            var result = await _permissionService.GetAllAsync(pageIndex, pageSize);
-            return Ok(result);
+            var (accounts, totalCount) = await _permissionService.GetAllAsync(pageIndex, pageSize, "");
+            return Ok(new { accounts, totalCount });
         }
 
         [HttpGet]

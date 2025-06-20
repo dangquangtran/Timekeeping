@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all login page functionality
     initFormSubmission();
     initValidationAnimations();
-    initRememberMe();
     initFocusAnimations();
 });
 
@@ -42,37 +41,7 @@ function initValidationAnimations() {
     });
 }
 
-// Remember me functionality
-function initRememberMe() {
-    const rememberMe = document.getElementById('rememberMe');
-    const usernameInput = document.querySelector('input[name="UserName"]');
-    
-    if (rememberMe && usernameInput) {
-        // Load saved username
-        if (localStorage.getItem('rememberMe') === 'true') {
-            rememberMe.checked = true;
-            usernameInput.value = localStorage.getItem('savedUsername') || '';
-        }
-        
-        // Save username when remember me is checked
-        rememberMe.addEventListener('change', function() {
-            if (this.checked) {
-                localStorage.setItem('rememberMe', 'true');
-                localStorage.setItem('savedUsername', usernameInput.value);
-            } else {
-                localStorage.removeItem('rememberMe');
-                localStorage.removeItem('savedUsername');
-            }
-        });
-        
-        // Update saved username as user types
-        usernameInput.addEventListener('input', function() {
-            if (rememberMe.checked) {
-                localStorage.setItem('savedUsername', this.value);
-            }
-        });
-    }
-}
+
 
 // Focus animation
 function initFocusAnimations() {
