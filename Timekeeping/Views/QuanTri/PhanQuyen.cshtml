@@ -1,6 +1,7 @@
 ﻿@model PermissionPageViewModel
 
 <link rel="stylesheet" href="~/css/phan-quyen.css" asp-append-version="true" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="container">
 	<p class="border-bottom mb-5">Quản trị/Phân quyền</p>
 	<h5 class="text-center" style="color: #ef4e24"><strong>PHÂN QUYỀN</strong></h5>
@@ -9,7 +10,7 @@
 
 	<div class="row">
 		<div class="col-md-4">
-			<form asp-controller="Permission" asp-action="ThemQuyen" method="post" class="text-start border p-3 rounded bg-light form-create">
+			<form asp-action="ThemQuyen" method="post" class="text-start border p-3 rounded bg-light form-create">
 				@if (TempData["SuccessMessage"] != null)
 				{
 					<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -29,13 +30,13 @@
 				@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 				<div class="mb-2">
 					<label class="form-label">Mã nhân sự</label>
-					<select asp-for="PermissionUpdate.MaNhanVien" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
+					<select id="select-mans" asp-for="PermissionUpdate.MaNhanVien" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
 						<option value="">Chọn mã nhân sự</option>
 						@if (Model.AllAccounts != null)
 						{
 							foreach (var acc in Model.AllAccounts)
 							{
-								<option value="@acc.MaNhanVien">@acc.MaNhanVien - @acc.HoTen</option>
+								<option value="@acc.MaNhanVien">@acc.MaNhanVien</option>
 							}
 						}
 					</select>
@@ -43,7 +44,7 @@
 				</div>
 				<div class="mb-2">
 					<label class="form-label" style="color: #666;">Thuộc nhóm ND</label>
-					<select asp-for="PermissionUpdate.ThuocNhomND" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
+						<select id="select-nhomnd" asp-for="PermissionUpdate.ThuocNhomND" class="form-select border-0 border-bottom rounded-0" style="box-shadow: none;">
 						<option value="">Chọn nhóm ND</option>
 						@if (Model.Permissions != null)
 						{
@@ -70,13 +71,15 @@
 					<div class="col-auto d-flex align-items-center">
 						<span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
 						<label class="me-2 mb-0">Nhân viên</label>
-						<select name="msnv" class="form-select w-auto" onchange="this.form.submit()">
+						<select id="filter-msnv" name="msnv" style="min-width:200px" onchange="this.form.submit()">
 							<option value="">Tất cả</option>
 							@if (Model.AllAccounts != null)
 							{
 								foreach (var acc in Model.AllAccounts)
 								{
-									<option value="@acc.MaNhanVien" selected="@(ViewBag.MSNV?.ToString() == acc.MaNhanVien)">@acc.MaNhanVien - @acc.HoTen</option>
+									<option value="@acc.MaNhanVien" selected="@(ViewBag.MSNV?.ToString() == acc.MaNhanVien)">
+										@acc.MaNhanVien
+									</option>
 								}
 							}
 						</select>
@@ -165,4 +168,7 @@
 
 @section Scripts {
 	@await Html.PartialAsync("_ValidationScriptsPartial")
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+	<script src="~/js/phan-quyen.js" asp-append-version="true"></script>
 }
+
