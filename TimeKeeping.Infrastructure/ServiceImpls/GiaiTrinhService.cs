@@ -118,7 +118,7 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
         //        return (Enumerable.Empty<GiaiTrinhGetViewModel>(), 0);
         //    }
         //}
-        public async Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName)
+        public async Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName, string tenKy = "")
         {
             _logger.LogInformation("Bắt đầu lấy danh sách Chấm Công với bộ lọc");
 
@@ -136,14 +136,29 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var maNhanVien = account.MaNhanVien;
 
                 // 1. Lấy tất cả bản ghi vi phạm theo nhân viên
-                var allData = await _unitOfWork.ViPhamChamCongVanTayRepo
+                var allDataQuery = await _unitOfWork.ViPhamChamCongVanTayRepo
                     .GetByConditionAsync(x => x.madv == maNhanVien && x.loaiviphamid != 0);
+
+                // 2. Filter theo kỳ nếu có
+                if (!string.IsNullOrEmpty(tenKy))
+                {
+                    // Lấy thông tin kỳ để có maky
+                    var kyInfo = await _unitOfWork.KyBaoCaoRepo
+                        .FirstOrDefaultAsync(k => k.tenky == tenKy);
+                    
+                    if (kyInfo != null)
+                    {
+                        allDataQuery = allDataQuery.Where(x => x.maky == kyInfo.maky);
+                    }
+                }
+
+                var allData = allDataQuery.ToList();
 
                 var totalCount = allData.Count();
 
-                // 2. Phân trang
+                // 3. Phân trang
                 var pagedData = allData
-                    .OrderByDescending(x => x.hoten)
+                    .OrderByDescending(x => x.ngay)
                     .Skip((pageIndex - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
@@ -151,14 +166,14 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 var viphamIds = pagedData.Select(x => x.viphamid).ToList();
                 var maKyList = pagedData.Select(x => x.maky).ToList();
 
-                // 3. Lấy dữ liệu giải trình theo các vi phạm được phân trang
+                // 4. Lấy dữ liệu giải trình theo các vi phạm được phân trang
                 var giaiTrinhList = await _unitOfWork.GiaiTrinhChamCongRepo
                     .GetByConditionAsync(gt => viphamIds.Contains(gt.viphamid) && maKyList.Contains(gt.maky));
 
-                // 4. Lấy danh sách lý do vi phạm
+                // 5. Lấy danh sách lý do vi phạm
                 var lyDoList = await _unitOfWork.LyDoViPhamRepo.GetAllAsync();
 
-                // 5. Mapping kết quả ra ViewModel
+                // 6. Mapping kết quả ra ViewModel
                 var pagedResult = pagedData.Select(x =>
                 {
                     var giaiTrinh = giaiTrinhList
@@ -208,25 +223,24 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
         }
 
 
-        public async Task<IEnumerable<GiaiTrinhChamCongViewModel>> SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel)
+        public async Task SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel)
         {
             try
             {
+                await _unitOfWork.BeginTransactionAsync();
+
                 var existing = await _unitOfWork.GiaiTrinhChamCongRepo
                     .FirstOrDefaultAsync(x => x.viphamid == giaiTrinhChamCongViewModel.viphamid && x.maky == giaiTrinhChamCongViewModel.maky);
 
                 if (existing != null)
                 {
-                    // Update lại lý do
                     existing.giaitrinhid = giaiTrinhChamCongViewModel.giaitrinhid;
                     _unitOfWork.GiaiTrinhChamCongRepo.Update(existing);
                 }
                 else
                 {
-                    // Thêm mới
                     var newItem = new tb_giaitrinh_chamcong
                     {
-                      //  Id = new Random().Next(1, int.MaxValue),
                         viphamid = giaiTrinhChamCongViewModel.viphamid,
                         maky = giaiTrinhChamCongViewModel.maky,
                         giaitrinhid = giaiTrinhChamCongViewModel.giaitrinhid
@@ -236,25 +250,11 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
-                // Trả về 1 ViewModel (ví dụ như để hiển thị lại sau khi lưu)
-                var result = new List<GiaiTrinhChamCongViewModel>
-        {
-            new GiaiTrinhChamCongViewModel
-            {
-                viphamid = giaiTrinhChamCongViewModel.viphamid,
-                maky = giaiTrinhChamCongViewModel.maky,
-                giaitrinhid = giaiTrinhChamCongViewModel.giaitrinhid
-            }
-        };
-
-                return result;
             }
             catch (Exception ex)
             {
-                var innerMessage = ex.InnerException?.Message;
-                _logger.LogError(ex, "Lỗi khi lưu giải trình: {Message} - Inner: {Inner}", ex.Message, innerMessage);
-
-                throw new Exception("Lỗi khi lưu giải trình: " + (innerMessage ?? ex.Message));
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
             }
         }
 
@@ -276,6 +276,39 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 await _unitOfWork.RollbackTransactionAsync();
                 _logger.LogError(ex, "Lỗi khi lấy danh sách chấm công có filter");
                 return (Enumerable.Empty<LyDoViPhamGiaiTrinhGetViewModel>());
+            }
+        }
+
+        public async Task<UserInfoViewModel?> GetUserInfoAsync(string userName)
+        {
+            try
+            {
+                var account = await _unitOfWork.AccountRepo
+                    .FirstOrDefaultAsync(acc => acc.UserName == userName);
+
+                if (account == null)
+                {
+                    _logger.LogWarning("Không tìm thấy tài khoản với User Name: {userName}", userName);
+                    return null;
+                }
+
+                // Lấy thông tin đơn vị
+                var donVi = await _unitOfWork.DonViRepo
+                    .FirstOrDefaultAsync(dv => dv.madv == account.MaDv);
+
+                return new UserInfoViewModel
+                {
+                    MaNhanVien = account.MaNhanVien,
+                    HoTen = account.FullName,
+                    ChucDanh = account.ChucVu,
+                    DonVi = donVi?.tendv ?? "Chưa xác định",
+                    UserName = account.UserName
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy thông tin user: {userName}", userName);
+                return null;
             }
         }
 

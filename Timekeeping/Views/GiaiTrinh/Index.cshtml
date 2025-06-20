@@ -1,1 +1,277 @@
-﻿
+﻿@model GiaiTrinhPageViewModel
+@{
+    var stt = 1 + (Model.PageIndex - 1) * Model.PageSize;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .giaitrinh-select {
+        width: 250px !important;
+        max-width: 250px;
+    }
+    
+    .select2-container {
+        width: 250px !important;
+    }
+</style>
+
+<div class="container">
+    <p class="border-bottom mb-5">Giải trình</p>
+    <h4 class="text-center" style="color: #ef4e24"><strong>VI PHẠM CÁ NHÂN</strong></h4>
+    @if (ViewBag.CurrentKy != null)
+    {
+        <p class="text-center">
+            Từ @(ViewBag.CurrentKy.tungay?.ToString("dd/MM/yyyy") ?? "N/A") 
+            đến @(ViewBag.CurrentKy.denngay?.ToString("dd/MM/yyyy") ?? "N/A")
+        </p>
+    }
+    else
+    {
+        <p class="text-center">Từ 25/04/2025 đến 24/05/2025</p>
+    }
+    
+    <!-- Thông tin nhân viên -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <p>Họ tên: @(ViewBag.UserInfo?.HoTen ?? "Chưa xác định")</p>
+            <p>MSNV: @(ViewBag.UserInfo?.MaNhanVien ?? "Chưa xác định")</p>
+        </div>
+        <div class="col-md-6">
+            <p>Chức vụ: @(ViewBag.UserInfo?.ChucDanh ?? "Chưa xác định")</p>
+            <p>Đơn vị: @(ViewBag.UserInfo?.DonVi ?? "Chưa xác định")</p>
+        </div>
+    </div>
+
+    <!-- FILTER CONTROLS -->
+    <div class="d-flex justify-content-between mb-2">
+        <form method="get" asp-action="Index" class="row align-items-center">
+            <div class="col-auto d-flex align-items-center">
+                <span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
+                <label class="me-2 mb-0">Kỳ</label>
+                <select name="ky" class="form-select w-auto" id="kySelect" onchange="this.form.submit()">
+                    <option value="">Chọn kỳ</option>
+                    @if (ViewBag.DanhSachKy != null)
+                    {
+                        foreach (var ky in ViewBag.DanhSachKy)
+                        {
+                            <option value="@ky.tenky" selected="@(ViewBag.SelectedKy == ky.tenky)">@ky.tenky</option>
+                        }
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="pageIndex" value="1" />
+        </form>
+
+        <form method="get" asp-action="Index" class="d-flex align-items-center">
+            <p class="mb-0 me-2">Chọn số dòng</p>
+            <select name="pageSize" class="form-select w-auto" onchange="this.form.submit()">
+                @foreach (var size in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@size" selected="@(Model.PageSize == size)">@size</option>
+                }
+            </select>
+            <input type="hidden" name="pageIndex" value="1" />
+            <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+        </form>
+    </div>
+
+    <!-- VI PHẠM CHẤM CÔNG VÂN TAY -->
+    <div class="mb-4">
+        <h6 style="color: #00bfff"><strong>Vi phạm chấm công vân tay</strong></h6>
+        <table class="table table-bordered table-hover" style="border-color:#00bfff">
+            <thead class="text-center" style="background-color: lightgray">
+                <tr>
+                    <th>STT</th>
+                    <th>Thứ</th>
+                    <th>Ngày</th>
+                    <th>Giờ vào</th>
+                    <th>Giờ ra</th>
+                    <th style="background-color:#ef4e24; color:white">Giải trình</th>
+                    <th style="background-color:#ef4e24; color:white">File</th>
+                </tr>
+            </thead>
+            <tbody id="vipham-tbody">
+                @if (Model.List?.Any() == true)
+                {
+                    foreach (var item in Model.List)
+                    {
+                        <tr>
+                            <td class="text-center">@stt</td>
+                            <td>@item.Thu</td>
+                            <td>@item.Ngay</td>
+                            <td>@item.GioVao</td>
+                            <td>@item.GioRa</td>
+                            <td>
+                                <select class="form-select giaitrinh-select" 
+                                        data-viphamid="@item.viphamid" 
+                                        data-maky="@item.maky">
+                                    <option value="">Di trễ/về sớm được TDV đồng ý</option>
+                                    @if (ViewBag.DanhSachLyDo != null)
+                                    {
+                                        foreach (var lydo in ViewBag.DanhSachLyDo)
+                                        {
+                                            <option value="@lydo.lydoid" 
+                                                    selected="@(item.GiaiTrinh == lydo.lydoid)">
+                                                @lydo.tenlydo
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                @if (item.File != null && item.File > 0)
+                                {
+                                    <i class="fa-solid fa-file text-primary"></i>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">Không có dữ liệu vi phạm</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-end align-items-center mb-4">
+            <form method="get" asp-action="Index" class="custom-pagination">
+                <input type="hidden" name="pageSize" value="@Model.PageSize" />
+                <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+
+                <button type="submit" class="custom-page-btn" name="pageIndex" value="1"
+                        disabled="@(Model.PageIndex == 1)" title="Trang đầu">
+                    &laquo;|
+                </button>
+                <button type="submit" class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)"
+                        disabled="@(Model.PageIndex == 1)" title="Trang trước">
+                    &lsaquo;
+                </button>
+                <span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+                <button type="submit" class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)"
+                        disabled="@(Model.PageIndex >= Model.TotalPages)" title="Trang sau">
+                    &rsaquo;
+                </button>
+                <button type="submit" class="custom-page-btn" name="pageIndex" value="@Model.TotalPages"
+                        disabled="@(Model.PageIndex >= Model.TotalPages)" title="Trang cuối">
+                    |&raquo;
+                </button>
+            </form>
+        </div>
+    }
+
+    <!-- VI PHẠM KHÁC -->
+    <div class="mb-4">
+        <h6 style="color: #00bfff"><strong>Vi phạm khác</strong></h6>
+        <p class="text-muted">Không có vi phạm khác</p>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-warning" id="hetHanGiaiTrinhBtn">
+            Hết hạn giải trình
+        </button>
+    </div>
+
+    <!-- DỮ LIỆU CHẤM CÔNG -->
+    <div class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 style="color: #00bfff"><strong>DỮ LIỆU CHẤM CÔNG</strong></h6>
+            <form method="get" asp-action="Index" class="d-flex align-items-center">
+                <p class="mb-0 me-2">Chọn số dòng</p>
+                <select name="chamCongPageSize" class="form-select w-auto" onchange="this.form.submit()">
+                    @foreach (var size in new[] { 10, 20, 50, 100 })
+                    {
+                        <option value="@size" selected="@((ViewBag.ChamCongPageSize ?? 10) == size)">@size</option>
+                    }
+                </select>
+                <input type="hidden" name="pageIndex" value="@Model.PageIndex" />
+                <input type="hidden" name="pageSize" value="@Model.PageSize" />
+                <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+            </form>
+        </div>
+
+        <table class="table table-bordered table-hover" style="border-color:#00bfff">
+            <thead class="text-center" style="background-color: lightgray">
+                <tr>
+                    <th>STT</th>
+                    <th>Ngày chấm</th>
+                    <th>Giờ chấm</th>
+                </tr>
+            </thead>
+            <tbody id="chamcong-tbody">
+                @{
+                    var chamCongStt = 1 + ((ViewBag.ChamCongPageIndex ?? 1) - 1) * (ViewBag.ChamCongPageSize ?? 10);
+                    var chamCongList = ViewBag.ChamCongList as IEnumerable<object>;
+                }
+                @if (chamCongList?.Any() == true)
+                {
+                    foreach (var item in chamCongList)
+                    {
+                        <tr>
+                            <td class="text-center">@chamCongStt</td>
+                            <td>@(((dynamic)item).NgayCham ?? "")</td>
+                            <td>@(((dynamic)item).GioCham ?? "")</td>
+                        </tr>
+                        chamCongStt++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Không có dữ liệu chấm công</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- PAGINATION CHO BẢNG CHẤM CÔNG -->
+        @if ((ViewBag.ChamCongTotalPages ?? 0) > 1)
+        {
+            <div class="d-flex justify-content-end align-items-center">
+                <form method="get" asp-action="Index" class="custom-pagination">
+                    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+                    <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+                    <input type="hidden" name="pageIndex" value="@Model.PageIndex" />
+                    <input type="hidden" name="chamCongPageSize" value="@(ViewBag.ChamCongPageSize ?? 10)" />
+
+                    <button type="submit" class="custom-page-btn" name="chamCongPageIndex" value="1"
+                            disabled="@((ViewBag.ChamCongPageIndex ?? 1) == 1)" title="Trang đầu">
+                        &laquo;|
+                    </button>
+                    <button type="submit" class="custom-page-btn" name="chamCongPageIndex" value="@((ViewBag.ChamCongPageIndex ?? 1) - 1)"
+                            disabled="@((ViewBag.ChamCongPageIndex ?? 1) == 1)" title="Trang trước">
+                        &lsaquo;
+                    </button>
+                    <span class="custom-page-info">@(ViewBag.ChamCongPageIndex ?? 1)/@(ViewBag.ChamCongTotalPages ?? 1)</span>
+                    <button type="submit" class="custom-page-btn" name="chamCongPageIndex" value="@((ViewBag.ChamCongPageIndex ?? 1) + 1)"
+                            disabled="@((ViewBag.ChamCongPageIndex ?? 1) >= (ViewBag.ChamCongTotalPages ?? 1))" title="Trang sau">
+                        &rsaquo;
+                    </button>
+                    <button type="submit" class="custom-page-btn" name="chamCongPageIndex" value="@(ViewBag.ChamCongTotalPages ?? 1)"
+                            disabled="@((ViewBag.ChamCongPageIndex ?? 1) >= (ViewBag.ChamCongTotalPages ?? 1))" title="Trang cuối">
+                        |&raquo;
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/giai-trinh.js" asp-append-version="true"></script>
+}
