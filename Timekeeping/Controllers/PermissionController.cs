@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.PermissionVIewModel;
 using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [AdminOnly]
     public class PermissionController : Controller
     {
         private readonly ILogger<PermissionController> _logger;

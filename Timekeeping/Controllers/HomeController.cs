@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Timekeeping.Models;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [UserOrAdmin]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

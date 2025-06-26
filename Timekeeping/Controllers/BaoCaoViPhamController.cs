@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Helpers;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.BaoCaoViPhamViewModel;
@@ -6,6 +7,7 @@ using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 
 namespace Timekeeping.Controllers
 {
+    [AdminOnly]
     public class BaoCaoViPhamController : Controller
     {
         private readonly ILogger<BaoCaoViPhamController> _logger;

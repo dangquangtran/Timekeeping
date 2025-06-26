@@ -5,10 +5,13 @@
         <nav class="nav col-md-5">
             <a href="/" class="nav-link custom-tab">TRANG CHỦ</a>
             <a href="/GiaiTrinh" class="nav-link custom-tab">GIẢI TRÌNH</a>
-            <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT<span class="menu-triangle"></span></a>
-            <a href="#" class="nav-link custom-tab" data-target="approval-dropdown">XÉT DUYỆT<span class="menu-triangle"></span></a>
-            <a href="#" class="nav-link custom-tab" data-target="report-dropdown">BÁO CÁO<span class="menu-triangle"></span></a>
-            <a href="#" class="nav-link custom-tab" data-target="admin-dropdown">QUẢN TRỊ<span class="menu-triangle"></span></a>
+            @if (User.FindFirst("GroupFuncID")?.Value == "1")
+            {
+                <a href="#" class="nav-link custom-tab" data-target="update-dropdown">CẬP NHẬT<span class="menu-triangle"></span></a>
+                <a href="#" class="nav-link custom-tab" data-target="approval-dropdown">XÉT DUYỆT<span class="menu-triangle"></span></a>
+                <a href="#" class="nav-link custom-tab" data-target="report-dropdown">BÁO CÁO<span class="menu-triangle"></span></a>
+                <a href="#" class="nav-link custom-tab" data-target="admin-dropdown">QUẢN TRỊ<span class="menu-triangle"></span></a>
+            }
         </nav>
         <div class="profile d-flex align-items-center col-md-4 justify-content-center">
             <div>

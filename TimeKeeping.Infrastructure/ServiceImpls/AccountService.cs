@@ -68,7 +68,8 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                 new Claim("UserName", account.UserName),
                 new Claim("FullName", account.FullName),
                 new Claim(ClaimTypes.Name, account.FullName), // Thêm dòng này
-                new Claim(ClaimTypes.Role, account.GroupFuncID.ToString()) 
+                new Claim(ClaimTypes.Role, account.GroupFuncID.ToString()),
+                new Claim("GroupFuncID", account.GroupFuncID.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecretKey));

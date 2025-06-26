@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [AdminOnly]
     public class LyDoViPhamController : Controller
     {
         private readonly ILogger<LyDoViPhamController> _logger;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
@@ -8,7 +9,7 @@ using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [UserOrAdmin]
     public class GiaiTrinhController : Controller
     {
         private readonly ILogger<GiaiTrinhController> _logger;
