@@ -9,6 +9,7 @@ using TimeKeeping.Application.Helpers;
 using TimeKeeping.Application.Interfaces;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.BaoCaoViPhamViewModel;
+using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
 using TimeKeeping.Domain.Entities;
 
@@ -414,9 +415,94 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
             }
         }
 
+        public async Task<IEnumerable<ListKyGetViewModel>> GetAllKyAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các kỳ cho báo cáo vi phạm");
+            try
+            {
+                var danhSachKy = await _unitOfWork.KyBaoCaoRepo.GetAllAsync();
+
+                var result = danhSachKy.Select(x => new ListKyGetViewModel
+                {
+                    ky = x.tenky,
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các kỳ cho báo cáo vi phạm");
+                return Enumerable.Empty<ListKyGetViewModel>();
+            }
+        }
+
+        public async Task<IEnumerable<ListDonViGetViewModel>> GetAllDonViAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các đơn vị cho báo cáo vi phạm");
+            try
+            {
+                var danhSachDonVi = await _unitOfWork.DonViRepo.GetAllAsync();
+
+                var result = danhSachDonVi.Select(x => new ListDonViGetViewModel
+                {
+                    DonVi = x.tendv,
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các đơn vị cho báo cáo vi phạm");
+                return Enumerable.Empty<ListDonViGetViewModel>();
+            }
+        }
 
 
+        public async Task<CurrentKyInfoViewModel?> GetCurrentKyInfoAsync(string? tenKy)
+        {
+            _logger.LogInformation("Bắt đầu lấy thông tin kỳ hiện tại");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(tenKy))
+                {
+                    // Nếu không có kỳ được chọn, lấy kỳ mới nhất
+                    var latestKy = await _unitOfWork.KyBaoCaoRepo.GetAllAsync();
+                    var latest = latestKy.OrderByDescending(k => k.denngay).FirstOrDefault();
 
+                    if (latest != null)
+                    {
+                        return new CurrentKyInfoViewModel
+                        {
+                            TenKy = latest.tenky,
+                            TuNgay = latest.tungay,
+                            DenNgay = latest.denngay
+                        };
+                    }
+                }
+                else
+                {
+                    // Lấy thông tin kỳ được chọn
+                    var kyInfo = await _unitOfWork.KyBaoCaoRepo
+                        .FirstOrDefaultAsync(k => k.tenky == tenKy);
 
+                    if (kyInfo != null)
+                    {
+                        return new CurrentKyInfoViewModel
+                        {
+                            TenKy = kyInfo.tenky,
+                            TuNgay = kyInfo.tungay,
+                            DenNgay = kyInfo.denngay
+                        };
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy thông tin kỳ hiện tại");
+                return null;
+            }
+        }
     }
 }

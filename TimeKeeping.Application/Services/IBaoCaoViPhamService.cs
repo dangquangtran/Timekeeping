@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TimeKeeping.Application.ViewModels.BaoCaoViPhamViewModel;
+using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
 
 namespace TimeKeeping.Application.Services
@@ -13,5 +14,10 @@ namespace TimeKeeping.Application.Services
         Task<(IEnumerable<BaoCaoViPhamChamCongVanGetViewModel> List, int TotalPages)> GetListBaoCaoViPhamChamCongVanTayAsync(int pageIndex, int pageSize);
         Task<(IEnumerable<BaoCaoViPhamChamCongVanGetViewModel> List, int TotalPages)> GetListBaoCaoViPhamChamCongVanTayFilterAsync(int pageIndex, int pageSize, string? maDonVi = null, string? maKy = null);
         Task<byte[]> ExportBaoCaoViPhamChamCongVanTayToExcelAsync(BaoCaoViPhamExportRequestViewModel request);
+        Task<IEnumerable<ListKyGetViewModel>> GetAllKyAsync();
+        Task<IEnumerable<ListDonViGetViewModel>> GetAllDonViAsync();
+        Task<CurrentKyInfoViewModel?> GetCurrentKyInfoAsync(string? tenKy);
+
+
     }
 }
