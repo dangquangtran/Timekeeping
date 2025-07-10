@@ -30,6 +30,7 @@ namespace TimeKeeping.Infrastructure
             services.AddScoped<IBaoCaokiService, BaoCaokiService>();
             services.AddScoped<IGiaiTrinhService, GiaiTrinhService>();
             services.AddScoped<IBaoCaoViPhamService, BaoCaoViPhamService>();
+            services.AddScoped<IXetDuyetGiaiTrinhService, XetDuyetGiaiTrinhService>();
 
             var jwtSecretKey = configuration["Jwt:SecretKey"];
 

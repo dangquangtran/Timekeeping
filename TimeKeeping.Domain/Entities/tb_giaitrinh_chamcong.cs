@@ -11,6 +11,7 @@ public partial class tb_giaitrinh_chamcong
     public int? giaitrinhid { get; set; }
 
     public int? maky { get; set; }
+    public bool? Status { get; set; }
 
     public virtual tb_lydovipham? giaitrinh { get; set; }
 
