@@ -1,0 +1,158 @@
+﻿@model BaoCaoViPhamPageViewModel
+@{
+    var stt = 1 + (Model.PageIndex - 1) * Model.PageSize;
+}
+
+<div class="container">
+    <p class="border-bottom mb-5">Báo cáo/Chấm công vân tay</p>
+    <h5 class="text-center" style="color: #ef4e24"><strong>BÁO CÁO VI PHẠM CHẤM CÔNG VÂN TAY</strong></h5>
+    @if (!string.IsNullOrEmpty(ViewBag.SelectedKy) && ViewBag.CurrentKy != null)
+    {
+        <p class="text-center mb-4">
+            Từ @(ViewBag.CurrentKy.TuNgay?.ToString("dd/MM/yyyy") ?? "N/A")
+            đến @(ViewBag.CurrentKy.DenNgay?.ToString("dd/MM/yyyy") ?? "N/A")
+        </p>
+    }
+    else
+    {
+        <p class="text-center mb-4 text-muted">Chưa chọn kỳ báo cáo</p>
+    }
+    <!-- FILTER AND PAGINATION CONTROLS -->
+    <div class="d-flex justify-content-between mb-2">
+        <form asp-controller="BaoCaoViPham" method="get" asp-action="ChamCongVanTay" class="row align-items-center">
+            <div class="col-auto d-flex align-items-center">
+                <span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
+                <label class="me-2 mb-0">Kỳ</label>
+                <select name="tenKy" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Chọn kỳ</option>
+                    @if (ViewBag.DanhSachKy != null)
+                    {
+                        foreach (var ky in ViewBag.DanhSachKy)
+                        {
+                            <option value="@ky.ky" selected="@(ViewBag.SelectedKy == ky.ky)">@ky.ky</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <label class="me-2 mb-0">Đơn vị</label>
+                <select name="tenDonVi" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Chọn đơn vị</option>
+                    @if (ViewBag.DanhSachDonVi != null)
+                    {
+                        foreach (var dv in ViewBag.DanhSachDonVi)
+                        {
+                            <option value="@dv.DonVi" selected="@(ViewBag.SelectedDonVi == dv.DonVi)">@dv.DonVi</option>
+                        }
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="pageIndex" value="1" />
+        </form>
+
+        <form method="get" asp-action="ChamCongVanTay" class="d-flex align-items-center">
+            <p class="mb-0 me-2">Chọn số dòng</p>
+            <select name="pageSize" class="form-select w-auto" onchange="this.form.submit()">
+                @foreach (var size in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@size" selected="@(Model.PageSize == size)">@size</option>
+                }
+            </select>
+            <input type="hidden" name="pageIndex" value="1" />
+            <input type="hidden" name="tenKy" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="tenDonVi" value="@ViewBag.SelectedDonVi" />
+        </form>
+    </div>
+
+    <!-- DATA TABLE -->
+    <table class="table-responsive table table-bordered table-hover" style="border-color:#00bfff">
+        <thead class="text-center" style="background-color: lightgray; white-space:nowrap">
+            <tr>
+                <th>STT</th>
+                <th>Mã NV</th>
+                <th>Họ tên</th>
+                <th>Chức vụ</th>
+                <th>Đơn vị</th>
+                <th>Thứ</th>
+                <th>Ngày</th>
+                <th>Giờ vào</th>
+                <th>Giờ ra</th>
+                <th>Giải trình</th>
+                <th>Trạng thái</th>
+                <th>Phân loại</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.List?.Any() == true)
+            {
+                foreach (var item in Model.List)
+                {
+                    <tr>
+                        <td class="text-center">@stt</td>
+                        <td class="text-center">@item.MaNv</td>
+                        <td>@item.HoTen</td>
+                        <td>@item.ChucVu</td>
+                        <td>@item.DonVi</td>
+                        <td class="text-center">@item.Thu</td>
+                        <td class="text-center">@item.Ngay</td>
+                        <td class="text-center">@(string.IsNullOrEmpty(item.GioVao) ? "-" : item.GioVao)</td>
+                        <td class="text-center">@(string.IsNullOrEmpty(item.GioRa) ? "-" : item.GioRa)</td>
+                        <td>@(string.IsNullOrEmpty(item.GiaiTrinh) ? "Chưa có" : item.GiaiTrinh)</td>
+                        <td class="text-center">
+                            @if (item.TrangThai == "Đã giải trình")
+                            {
+                                <span class="badge bg-success">Đã giải trình</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Chưa giải trình</span>
+                            }
+                        </td>
+                        <td>@item.PhanLoai</td>
+                    </tr>
+                    stt++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="12" class="text-center text-danger">Không có dữ liệu vi phạm</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- EXPORT AND PAGINATION -->
+    <div class="d-flex justify-content-between">
+        <form method="post" asp-action="ExportExcelViPhamChamCong" target="_blank" class="mb-0">
+            <input type="hidden" name="Ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="TenDonVi" value="@ViewBag.SelectedDonVi" />
+            <button type="submit" class="btn btn-success">Export Excel</button>
+        </form>
+
+        <form method="get" asp-action="ChamCongVanTay" class="custom-pagination">
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="tenKy" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="tenDonVi" value="@ViewBag.SelectedDonVi" />
+
+            <button class="custom-page-btn" name="pageIndex" value="1"
+                    disabled="@(Model.PageIndex == 1)" title="Trang đầu">
+                &laquo;|
+            </button>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)"
+                    disabled="@(Model.PageIndex == 1)" title="Trang trước">
+                &lsaquo;
+            </button>
+            <span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)"
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang sau">
+                &rsaquo;
+            </button>
+            <button class="custom-page-btn" name="pageIndex" value="@Model.TotalPages"
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang cuối">
+                |&raquo;
+            </button>
+        </form>
+    </div>
+</div>

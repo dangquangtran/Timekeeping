@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.PermissionVIewModel;
 using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [AdminOnly]
     public class PermissionController : Controller
     {
         private readonly ILogger<PermissionController> _logger;
@@ -69,9 +70,9 @@ namespace Timekeeping.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDanhSachAccount([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetDanhSachAccount([FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] string msnv)
         {
-            var (accounts, totalCount) = await _permissionService.GetAllAsync(pageIndex, pageSize, "");
+            var (accounts, totalCount) = await _permissionService.GetAllAsync(pageIndex, pageSize, msnv);
             return Ok(new { accounts, totalCount });
         }
 

@@ -12,8 +12,9 @@ namespace TimeKeeping.Application.Services
     public interface IGiaiTrinhService
     {
         Task<(IEnumerable<GiaiTrinhBaoCaoGetViewModel> List, int TotalPages)> GetListChamCongAsync(int pageIndex, int pageSize, string userName);
-        Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName);
-        Task<IEnumerable<GiaiTrinhChamCongViewModel>> SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel);
+        Task<(IEnumerable<GiaiTrinhGetViewModel> List, int TotalPages)> GetListGiaiTrinhAsync(int pageIndex, int pageSize, string userName, string tenKy = "");
+        Task SaveGiaiTrinhAsync(GiaiTrinhChamCongViewModel giaiTrinhChamCongViewModel);
         Task<IEnumerable<LyDoViPhamGiaiTrinhGetViewModel>> GetListLidoAsync();
+        Task<UserInfoViewModel?> GetUserInfoAsync(string userName);
     }
 }

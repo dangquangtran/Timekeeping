@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TimeKeeping.Application.Attributes;
 using TimeKeeping.Application.Services;
 using TimeKeeping.Application.ViewModels.AccountViewModel;
 using TimeKeeping.Application.ViewModels.BaoCaokiViewModel;
@@ -7,7 +8,7 @@ using TimeKeeping.Infrastructure.ServiceImpls;
 
 namespace Timekeeping.Controllers
 {
-    [Authorize]
+    [AdminOnly]
     public class BaoCaokiController : Controller
     {
         private readonly ILogger<BaoCaokiController> _logger;

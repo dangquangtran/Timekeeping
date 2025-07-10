@@ -71,7 +71,7 @@
 					<div class="col-auto d-flex align-items-center">
 						<span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
 						<label class="me-2 mb-0">Nhân viên</label>
-						<select id="filter-msnv" name="msnv" style="min-width:200px" onchange="this.form.submit()">
+						<select id="filter-msnv" name="msnv" style="min-width:200px">
 							<option value="">Tất cả</option>
 							@if (Model.AllAccounts != null)
 							{
@@ -113,7 +113,7 @@
 						<td>Thuộc nhóm ND</td>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="accounts-tbody">
 					@if (Model.Accounts != null && Model.Accounts.Any())
 					{
 						foreach (var item in Model.Accounts)
