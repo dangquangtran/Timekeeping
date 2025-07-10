@@ -8,6 +8,8 @@ namespace TimeKeeping.Application.ViewModels.XetDuyetViewModel
 {
     public class XetDuyetGetViewModel
     {
+        public string? MaNhanVien { get; set; }
+        public string? HoTen { get; set; }
         public string Thu { get; set; }
         public string Ngay { get; set; }
         public string GioVao { get; set; }

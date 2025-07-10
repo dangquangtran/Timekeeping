@@ -99,6 +99,8 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
 
                     return new XetDuyetGetViewModel
                     {
+                        MaNhanVien = x.mans,
+                        HoTen = x.hoten,
                         Thu = x.ngay.HasValue ? GetThuFromDateTime(x.ngay.Value) : "",
                         Ngay = x.ngay?.ToString("dd/MM/yyyy"),
                         GioVao = x.time_in,
