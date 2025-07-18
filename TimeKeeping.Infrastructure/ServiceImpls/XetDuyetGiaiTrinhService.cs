@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeKeeping.Application.Interfaces;
 using TimeKeeping.Application.Services;
+using TimeKeeping.Application.ViewModels.ChamCongCheckInOutV1ViewModel;
 using TimeKeeping.Application.ViewModels.GiaiTrinhViewModel;
 using TimeKeeping.Application.ViewModels.XetDuyetViewModel;
+using TimeKeeping.Domain.Entities;
 
 namespace TimeKeeping.Infrastructure.ServiceImpls
 {
@@ -93,9 +95,15 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
                     var lyDo = lyDoList
                         .FirstOrDefault(ld => ld.lydoid == giaiTrinh?.giaitrinhid);
 
-                    string statusStr = "Chưa Xét Duyệt";
-                    if (giaiTrinh?.Status == true)
-                        statusStr = "Đã Xét Duyệt";
+                    // **FIX**: Logic hiển thị trạng thái đúng
+                    string statusStr = "Chưa Xét Duyệt";
+                    if (giaiTrinh != null && giaiTrinh.Status == true)
+                    {
+                        statusStr = "Đã Xét Duyệt";
+                    }
+
+                    _logger.LogDebug("Vi phạm {ViphamId}: giaiTrinh={HasGiaiTrinh}, Status={Status}, DisplayStatus={DisplayStatus}", 
+                        x.viphamid, giaiTrinh != null, giaiTrinh?.Status, statusStr);
 
                     return new XetDuyetGetViewModel
                     {
@@ -164,28 +172,107 @@ namespace TimeKeeping.Infrastructure.ServiceImpls
         public async Task<int> ApproveSelectedAsync(IEnumerable<(string viphamid, int? maky)> ids)
         {
             _logger.LogInformation("Bắt đầu duyệt các giải trình được chọn");
+            
+            // **FIX**: Bắt đầu transaction explicit
+            await _unitOfWork.BeginTransactionAsync();
+            
             try
             {
                 int count = 0;
                 foreach (var (viphamid, maky) in ids)
                 {
+                    _logger.LogInformation("Đang xử lý: viphamid={ViphamId}, maky={Maky}", viphamid, maky);
+                    
                     var item = await _unitOfWork.GiaiTrinhChamCongRepo.FirstOrDefaultAsync(x => x.viphamid == viphamid && x.maky == maky);
-                    if (item != null && (item.Status == false || item.Status == null))
+                    
+                    if (item == null)
                     {
+                        _logger.LogWarning("Không tìm thấy bản ghi giải trình cho viphamid={ViphamId}, maky={Maky}. Tạo mới bản ghi.", viphamid, maky);
+                        
+                        // Tạo mới bản ghi giải trình nếu chưa có
+                        item = new TimeKeeping.Domain.Entities.tb_giaitrinh_chamcong
+                        {
+                            viphamid = viphamid,
+                            maky = maky,
+                            giaitrinhid = null,
+                            Status = true
+                        };
+                        
+                        await _unitOfWork.GiaiTrinhChamCongRepo.AddAsync(item);
+                        count++;
+                        _logger.LogInformation("Đã tạo và duyệt bản ghi mới cho viphamid={ViphamId}", viphamid);
+                    }
+                    else if (item.Status == false || item.Status == null)
+                    {
+                        _logger.LogInformation("Tìm thấy bản ghi chưa duyệt, đang cập nhật Status = true");
                         item.Status = true;
                         _unitOfWork.GiaiTrinhChamCongRepo.Update(item);
                         count++;
+                        _logger.LogInformation("Đã duyệt bản ghi cho viphamid={ViphamId}", viphamid);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Bản ghi viphamid={ViphamId} đã được duyệt trước đó (Status={Status})", viphamid, item.Status);
                     }
                 }
-                await _unitOfWork.SaveChangesAsync();
+                
+                // **FIX**: Lưu thay đổi trước khi commit
+                var savedChanges = await _unitOfWork.SaveChangesAsync();
+                _logger.LogInformation("Đã lưu {SavedChanges} thay đổi vào database", savedChanges);
+                
+                // **FIX**: Commit transaction
                 await _unitOfWork.CommitTransactionAsync();
+                _logger.LogInformation("Transaction committed thành công. Tổng số bản ghi được duyệt: {Count}", count);
+                
                 return count;
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                _logger.LogError(ex, "Lỗi khi duyệt các giải trình được chọn");
+                _logger.LogError(ex, "Lỗi khi duyệt các giải trình được chọn. Transaction đã được rollback.");
                 throw;
+            }
+        }
+
+        public async Task<IEnumerable<ListKyGetViewModel>> GetAllKyAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các kỳ cho xét duyệt giải trình");
+            try
+            {
+                var danhSachKy = await _unitOfWork.KyBaoCaoRepo.GetAllAsync();
+
+                var result = danhSachKy.Select(x => new ListKyGetViewModel
+                {
+                    ky = x.tenky,
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các kỳ cho xét duyệt giải trình");
+                return Enumerable.Empty<ListKyGetViewModel>();
+            }
+        }
+
+        public async Task<IEnumerable<ListDonViGetViewModel>> GetAllDonViAsync()
+        {
+            _logger.LogInformation("Bắt đầu lấy các đơn vị cho xét duyệt giải trình");
+            try
+            {
+                var danhSachDonVi = await _unitOfWork.DonViRepo.GetAllAsync();
+
+                var result = danhSachDonVi.Select(x => new ListDonViGetViewModel
+                {
+                    DonVi = x.tendv,
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy các đơn vị cho xét duyệt giải trình");
+                return Enumerable.Empty<ListDonViGetViewModel>();
             }
         }
 

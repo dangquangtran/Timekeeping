@@ -1,0 +1,241 @@
+﻿@model XetDuyetPageViewModel
+@{
+    var stt = 1 + (Model.PageIndex - 1) * Model.PageSize;
+}
+
+<div class="container">
+    <p class="border-bottom mb-5">Xét duyệt/ Duyệt đơn vị</p>
+    <h5 class="text-center" style="color: #ef4e24"><strong>XÉT DUYỆT VI PHẠM ĐƠN VỊ</strong></h5>
+    
+    @if (!string.IsNullOrEmpty(ViewBag.SelectedKy))
+    {
+        <p class="text-center mb-4">
+            Từ @ViewBag.SelectedKy
+        </p>
+    }
+    else
+    {
+        <p class="text-center mb-4 text-muted">Chưa chọn kỳ báo cáo</p>
+    }
+
+    <!-- FILTER AND PAGINATION CONTROLS -->
+    <div class="d-flex justify-content-between mb-2">
+        <form asp-controller="XetDuyetGiaiTrinh" method="get" asp-action="Index" class="row align-items-center">
+            <div class="col-auto d-flex align-items-center">
+                <span class="me-2"><i class="fa-solid fa-filter" style="color:#00bfff"></i></span>
+                <label class="me-2 mb-0">Trạng thái</label>
+                <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Tất cả</option>
+                    <option value="Chưa Xét Duyệt" selected="@(ViewBag.SelectedStatus == "Chưa Xét Duyệt")">Chưa duyệt</option>
+                    <option value="Đã Xét Duyệt" selected="@(ViewBag.SelectedStatus == "Đã Xét Duyệt")">Đã duyệt</option>
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <label class="me-2 mb-0">Kỳ</label>
+                <select name="ky" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Tất cả</option>
+                    @if (ViewBag.DanhSachKy != null)
+                    {
+                        foreach (var kyItem in ViewBag.DanhSachKy)
+                        {
+                            <option value="@kyItem.ky" selected="@(ViewBag.SelectedKy == kyItem.ky)">@kyItem.ky</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <label class="me-2 mb-0">Đơn vị</label>
+                <select name="donVi" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="">Trung tâm Phát triển Công nghệ</option>
+                    @if (ViewBag.DanhSachDonVi != null)
+                    {
+                        foreach (var dv in ViewBag.DanhSachDonVi)
+                        {
+                            <option value="@dv.DonVi" selected="@(ViewBag.SelectedDonVi == dv.DonVi)">@dv.DonVi</option>
+                        }
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="pageIndex" value="1" />
+        </form>
+
+        <form method="get" asp-action="Index" class="d-flex align-items-center">
+            <p class="mb-0 me-2">Chọn số dòng</p>
+            <select name="pageSize" class="form-select w-auto" onchange="this.form.submit()">
+                @foreach (var size in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@size" selected="@(Model.PageSize == size)">@size</option>
+                }
+            </select>
+            <input type="hidden" name="pageIndex" value="1" />
+            <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="donVi" value="@ViewBag.SelectedDonVi" />
+            <input type="hidden" name="status" value="@ViewBag.SelectedStatus" />
+        </form>
+    </div>
+
+    <!-- TITLE -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h6 style="color: #007bff;">Vi phạm chấm công vân tay</h6>
+        </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <table class="table-responsive table table-bordered table-hover" style="border-color:#00bfff">
+        <thead class="text-center" style="background-color: lightgray; white-space:nowrap">
+            <tr>
+                <th>STT</th>
+                <th>Mã NV</th>
+                <th>Tên nhân viên</th>
+                <th>Thứ</th>
+                <th>Ngày</th>
+                <th>Giờ vào</th>
+                <th>Giờ ra</th>
+                <th style="background-color: lightblue;">Giải trình<br/>Lý do</th>
+                <th style="background-color: lightblue;">Kiểm file</th>
+                <th>Trạng thái</th>
+                <th>Chọn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.List?.Any() == true)
+            {
+                foreach (var item in Model.List)
+                {
+                    <tr>
+                        <td class="text-center">@stt</td>
+                        <td class="text-center">@item.MaNhanVien</td>
+                        <td>@item.HoTen</td>
+                        <td class="text-center">@item.Thu</td>
+                        <td class="text-center">@item.Ngay</td>
+                        <td class="text-center">@(string.IsNullOrEmpty(item.GioVao) ? "-" : item.GioVao)</td>
+                        <td class="text-center">@(string.IsNullOrEmpty(item.GioRa) ? "-" : item.GioRa)</td>
+                        <td>@(item.GiaiTrinh.HasValue ? $"Đi trễ hơn 10 phút" : "Không chấm vân tay 1 chiều")</td>
+                        <td class="text-center">
+                            @if (item.File.HasValue && item.File.Value > 0)
+                            {
+                                <i class="fa-solid fa-file" style="color: #007bff;"></i>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (item.Status == "Đã Xét Duyệt")
+                            {
+                                <span class="badge bg-success">Đã duyệt</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Chưa duyệt</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input approval-checkbox" 
+                                   data-viphamid="@item.viphamid" 
+                                   data-maky="@item.maky"
+                                   @(item.Status == "Đã Xét Duyệt" ? "disabled" : "") />
+                        </td>
+                    </tr>
+                    stt++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="11" class="text-center text-danger">Không có dữ liệu vi phạm</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- ACTION BUTTONS AND PAGINATION -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-warning" id="selectAllBtn">Chọn tất cả</button>
+            <button type="button" class="btn btn-success" id="approveBtn">DUYỆT</button>
+            <button type="button" class="btn btn-secondary">TRỞ VỀ</button>
+        </div>
+
+        <form method="get" asp-action="Index" class="custom-pagination">
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="ky" value="@ViewBag.SelectedKy" />
+            <input type="hidden" name="donVi" value="@ViewBag.SelectedDonVi" />
+            <input type="hidden" name="status" value="@ViewBag.SelectedStatus" />
+
+            <button class="custom-page-btn" name="pageIndex" value="1"
+                    disabled="@(Model.PageIndex == 1)" title="Trang đầu">
+                &laquo;|
+            </button>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex - 1)"
+                    disabled="@(Model.PageIndex == 1)" title="Trang trước">
+                &lsaquo;
+            </button>
+            <span class="custom-page-info">@Model.PageIndex/@Model.TotalPages</span>
+            <button class="custom-page-btn" name="pageIndex" value="@(Model.PageIndex + 1)"
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang sau">
+                &rsaquo;
+            </button>
+            <button class="custom-page-btn" name="pageIndex" value="@Model.TotalPages"
+                    disabled="@(Model.PageIndex == Model.TotalPages)" title="Trang cuối">
+                |&raquo;
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Select all checkbox functionality
+            $('#selectAllBtn').click(function() {
+                $('.approval-checkbox:not(:disabled)').prop('checked', true);
+            });
+
+            // Approve selected items
+            $('#approveBtn').click(function() {
+                var selectedItems = [];
+                $('.approval-checkbox:checked:not(:disabled)').each(function() {
+                    selectedItems.push({
+                        viphamid: String($(this).data('viphamid')), // Đảm bảo là string
+                        maky: $(this).data('maky')
+                    });
+                });
+
+                if (selectedItems.length === 0) {
+                    alert('Vui lòng chọn ít nhất một mục để duyệt.');
+                    return;
+                }
+
+                if (confirm('Bạn có chắc chắn muốn duyệt ' + selectedItems.length + ' mục đã chọn?')) {
+                    $.ajax({
+                        url: '@Url.Action("ApproveSelected", "XetDuyetGiaiTrinh")',
+                        type: 'POST',
+                        contentType: 'application/json; charset=utf-8',
+                        data: JSON.stringify(selectedItems),
+                        beforeSend: function() {
+                            $('#approveBtn').prop('disabled', true).text('Đang duyệt...');
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                var message = response.message || ('Duyệt thành công ' + response.approvedCount + ' mục!');
+                                alert(message);
+                                location.reload();
+                            } else {
+                                alert('Có lỗi xảy ra khi duyệt: ' + (response.message || 'Lỗi không xác định'));
+                                $('#approveBtn').prop('disabled', false).text('DUYỆT');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Có lỗi xảy ra khi duyệt: ' + error);
+                            $('#approveBtn').prop('disabled', false).text('DUYỆT');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

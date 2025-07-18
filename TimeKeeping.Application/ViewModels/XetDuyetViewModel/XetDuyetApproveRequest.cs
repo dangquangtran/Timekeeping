@@ -1,10 +1,14 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace TimeKeeping.Application.ViewModels.XetDuyetViewModel
 {
     public class XetDuyetApproveRequest
     {
-        public string viphamid { get; set; }
+        [JsonPropertyName("viphamid")]
+        public string viphamid { get; set; } = string.Empty;
+        
+        [JsonPropertyName("maky")]
         public int? maky { get; set; }
     }
 }

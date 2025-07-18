@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TimeKeeping.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,21 @@ builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
     });
+
+// Add CORS service allowing all origins, methods, and headers
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 //JWT Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -39,6 +55,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Enable CORS middleware before authentication/authorization
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
